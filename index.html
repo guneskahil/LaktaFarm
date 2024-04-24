@@ -70,7 +70,7 @@
                                 <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
-                        <a href="contact.html" class="nav-item nav-link" >Giriş Yap</a>
+                        <a href="#" class="nav-item nav-link active" onclick="openModal('myModal')">Giriş Yap</a>
                     </div>
                 </div>
             </nav>
@@ -150,6 +150,32 @@
     </div>
     <!-- Destination Start -->
 
+    <!-- Login Modal-->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" style="" onclick="closeModal('myModal')">&times;</span>
+            <h2 style="text-align: center">Giriş Yap</h2>
+            <form class="login-form" onsubmit="checkCredentials(event)">
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="username" style="display: block; margin-bottom: 5px;">Kullanıcı Adı:</label>
+                    <input type="text" id="username" name="username" style="width: 100%; padding: 8px;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
+                    <input type="text" id="password" name="password" style="width: 100%; padding: 8px;">
+
+                </div>
+                <div class="input-group">
+                    <input type="submit" value="Giriş Yap">
+                </div>
+            </form>
+            <p style="text-align: center; margin-top: 10px;">
+                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
+            </p>
+            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
+        </div>
+    </div>
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -220,6 +246,7 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
 </body>
 
 </html>
