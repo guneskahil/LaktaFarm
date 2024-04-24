@@ -64,7 +64,7 @@
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">İnekler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
                                 <a href="gunlukKontrol.html" class="dropdown-item">Günlük Takip</a>
-                                <a href="single.html" class="dropdown-item">Dölleme Takip</a>
+                                <a href="dollemeTakip.html" class="dropdown-item">Dölleme Takip</a>
                                 <a href="destination.html" class="dropdown-item">Gebe Takip</a>
                                 <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
                                 <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
@@ -78,6 +78,34 @@
     </div>
     <!-- Navbar End -->
 
+    <!-- Login Modal Start-->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" style="" onclick="closeModal('myModal')">&times;</span>
+            <h2 style="text-align: center">Giriş Yap</h2>
+            <form class="login-form" onsubmit="checkCredentials(event)">
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="username" style="display: block; margin-bottom: 5px;">Kullanıcı Adı:</label>
+                    <input type="text" id="username" name="username" style="width: 100%; padding: 8px;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
+                    <input type="text" id="password" name="password" style="width: 100%; padding: 8px;">
+
+                </div>
+                <div class="input-group">
+                    <input type="submit" value="Giriş Yap">
+                </div>
+            </form>
+            <p style="text-align: center; margin-top: 10px;">
+                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
+            </p>
+            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
+        </div>
+    </div>
+    <!--Login Modal End-->
+
 
     <!-- Carousel Start -->
     <div class="container-fluid p-0">
@@ -89,7 +117,8 @@
                         <div class="p-3" style="max-width: 900px;">
                             <h4 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h4>
                             <h1 class="display-3 text-white mb-md-4">LaktaFarmla verimi katla</h1>
-                            <a href="contact.html" class="btn btn-primary py-md-3 px-md-5 mt-2">Giriş Yap</a>
+                            <a href="#" class="btn btn-primary py-md-3 px-md-5 mt-2"
+                                onclick="openModal('myModal')">Giriş Yap</a>
                         </div>
                     </div>
                 </div>
@@ -150,32 +179,7 @@
     </div>
     <!-- Destination Start -->
 
-    <!-- Login Modal-->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" style="" onclick="closeModal('myModal')">&times;</span>
-            <h2 style="text-align: center">Giriş Yap</h2>
-            <form class="login-form" onsubmit="checkCredentials(event)">
-                <div class="input-group" style="margin-bottom: 5px;">
-                    <label for="username" style="display: block; margin-bottom: 5px;">Kullanıcı Adı:</label>
-                    <input type="text" id="username" name="username" style="width: 100%; padding: 8px;">
-                </div>
 
-                <div class="input-group" style="margin-bottom: 5px;">
-                    <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
-                    <input type="text" id="password" name="password" style="width: 100%; padding: 8px;">
-
-                </div>
-                <div class="input-group">
-                    <input type="submit" value="Giriş Yap">
-                </div>
-            </form>
-            <p style="text-align: center; margin-top: 10px;">
-                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
-            </p>
-            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
-        </div>
-    </div>
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -185,7 +189,7 @@
                     <h1 class="text-primary"><span class="text-white">Lakta</span>Farm</h1>
                 </a>
                 <h2>LaktaFarmla verimi katla</h2>
-                
+
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
                 <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Döngüler</h5>
@@ -208,22 +212,14 @@
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
                 <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">İletişim</h5>
-                <p><i class="fa fa-map-marker-alt mr-2"></i>Kabaoğlu, Kocaeli Üniversitesi Umuttepe Kampüsü, A Kapısı, 41001 İzmit/Kocaeli</p>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>Kabaoğlu, Kocaeli Üniversitesi Umuttepe Kampüsü, A Kapısı,
+                    41001 İzmit/Kocaeli</p>
                 <p><i class="fa fa-phone-alt mr-2"></i>+012 345 67890</p>
                 <p><i class="fa fa-envelope mr-2"></i>LaktaFarm@example.com</p>
-                <div class="w-100">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-light" style="padding: 25px;"
-                            placeholder="Your Email">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary px-3">Giriş yap</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-   
+
     <!-- Footer End -->
 
 
