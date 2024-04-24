@@ -94,12 +94,13 @@ h6,
 }
 
 @media (max-width: 991.98px) {
-    .navbar-light .navbar-nav .nav-link  {
+    .navbar-light .navbar-nav .nav-link {
         padding: 10px 15px;
     }
 }
 
 @media (min-width: 992px) {
+
     #header-carousel,
     .page-header {
         margin-top: -42px;
@@ -185,7 +186,7 @@ h6,
 }
 
 .service-item i {
-    width:75px;
+    width: 75px;
     height: 75px;
     display: flex;
     align-items: center;
@@ -269,7 +270,7 @@ h6,
     transition: .3s .15s;
 }
 
-.team-item .team-img img  {
+.team-item .team-img img {
     transition: .5s;
 }
 

@@ -98,8 +98,7 @@
                 <div class="text-center mb-3 pb-3">
                     <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Günlük Kontrol</h6>
                 </div>
-                <br>
-                <div class=" row justify-content-center">
+                <div class="row justify-content-center">
                     <table>
                         <thead>
                             <tr>
@@ -110,22 +109,21 @@
                                 <th>Detay</th>
                             </tr>
                         </thead>
-                        <div class="col-md-4">
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ row['name'] }}</h5>
-                                    <p class="card-text">Döngü: {{ row['cycle'] }}</p>
-                                    <p class="card-text">Kg: {{ row['kg'] }}</p>
-                                    <p class="card-text">Süt: {{ row['milk'] }}</p>
-                                    <a href="detay_sayfasi.html" class="btn btn-primary">Detay</a>
-                                </div>
-                            </div>
-                        </div>
+                        <tbody>
+                            <tr>
+                                <td>İnek Adı 1</td>
+                                <td>Döngü Bilgisi 1</td>
+                                <td>Kg Bilgisi 1</td>
+                                <td>Süt Bilgisi 1</td>
+                                <td><a href="inekdetay.html" class="btn btn-primary">Detay</a></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Contact End -->
 
 
