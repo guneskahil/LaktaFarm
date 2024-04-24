@@ -6806,7 +6806,9 @@ button.bg-light:focus {
 }
 
 .bg-dark {
-  background-color: #212121 !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9)), url(../img/inek3-3.jpg), no-repeat center center;
+  background-size: cover;
+  background-color: rgb(140, 51, 7, 0.8);
 }
 
 a.bg-dark:hover,
