@@ -1,3 +1,60 @@
+<?php
+session_start();
+
+function dbBaglantisi()
+{
+    $sunucu = "bulutsqldeneme.database.windows.net";
+    $veritabani = "LaktaFarmDB";
+    $kullanici = "sqladmin";
+    $sifre = "admin.123";
+
+    try {
+        $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
+        return $db;
+    } catch (PDOException $e) {
+        echo "<script>alert('Veritabanına bağlanırken hata oluştu: " . $e->getMessage() . "');</script>";
+        return null;
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $mail = $_POST['mail'];
+    $sifre = $_POST['sifre'];
+
+    $db = dbBaglantisi();
+
+    if ($db instanceof PDO) {
+        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
+        $query->bindParam(':mail', $mail);
+        $query->bindParam(':sifre', $sifre);
+        $query->execute();
+        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($kullanici) {
+            // Kullanıcı bulundu, giriş yap
+            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            header("Location: index.php"); // Ana sayfaya yönlendir
+            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+        } else {
+            // Kullanıcı bulunamadı, hata mesajını JavaScript ile göster
+            echo "<script>alert('Hatalı giriş bilgileri. Lütfen tekrar deneyin.');</script>";
+        }
+    } else {
+        // Veritabanına bağlanılamadı, hata mesajını JavaScript ile göster
+        echo "<script>alert('Veritabanı bağlantısı yapılamadı.');</script>";
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
+    // Çıkış işlemi
+    session_unset();
+    session_destroy();
+    // Ana sayfaya yönlendirme
+    header("Location: index.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,22 +87,8 @@
 
 <body>
     <!-- db connection start-->
-    <?php
-    function dbBaglantisi()
-    {
-        $sunucu = "bulutsqldeneme.database.windows.net";
-        $veritabani = "LaktaFarmDB";
-        $kullanici = "sqladmin";
-        $sifre = "admin.123";
 
-        try {
-            $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
-            return $db;
-        } catch (PDOException $e) {
-            return "Veritabanına bağlanırken hata oluştu: " . $e->getMessage();
-        }
-    }
-    ?>
+
     <!-- db connection end-->
 
 
@@ -69,8 +112,7 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="index.php
-        " class="nav-item nav-link active">Ana Sayfa</a>
+                        <a href="index.php" class="nav-item nav-link active">Ana Sayfa</a>
 
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
@@ -91,7 +133,21 @@
                                 <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
-                        <a href="#" class="nav-item nav-link active" onclick="openModal('myModal')">Giriş Yap</a>
+                        <?php if (isset($_SESSION['ad'])): ?>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Merhaba, <?php echo $_SESSION['ad']; ?>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="profil.php">Profilim</a>
+                                    <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <a href="#" class="nav-item nav-link" onclick="openModal('myModal')">Giriş Yap</a>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </nav>
@@ -112,7 +168,7 @@
 
                 <div class="input-group" style="margin-bottom: 5px;">
                     <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
-                    <input type="password" id="password" name="password" style="width: 100%; padding: 8px;">
+                    <input type="password" id="sifre" name="sifre" style="width: 100%; padding: 8px;">
                 </div>
 
                 <div class="input-group">
