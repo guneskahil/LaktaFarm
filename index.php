@@ -36,12 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: index.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
-            // Kullanıcı bulunamadı, hata mesajını JavaScript ile göster
-            echo "<script>alert('Hatalı giriş bilgileri. Lütfen tekrar deneyin.');</script>";
+            // Kullanıcı bulunamadı, hata mesajı ayarla
+            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
         }
     } else {
-        // Veritabanına bağlanılamadı, hata mesajını JavaScript ile göster
-        echo "<script>alert('Veritabanı bağlantısı yapılamadı.');</script>";
+        // Veritabanına bağlanılamadı, hata mesajı ayarla
+        $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
 
@@ -155,12 +155,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Navbar End -->
 
-    <!-- Login Modal Start-->
-    <div id="myModal" class="modal">
+    <!-- Modal Start -->
+ <div id="myModal" class="modal">
         <div class="modal-content">
-            <span class="close" style="" onclick="closeModal('myModal')">×</span>
-            <h2 style="text-align: center">Giriş Yap</h2>
-            <form class="login-form" onsubmit="checkCredentials(event)" action="index.php" method="POST">
+            <span class="close" onclick="closeAndResetModal('myModal')">×</span>
+            <h2 style="text-align: center" onclick="">Giriş Yap</h2>
+            <!-- Hata Mesajı için -->
+            <p id="loginError" style="text-align: center; color: red;"><?php echo isset($error) ? $error : ''; ?></p>
+            <form class="login-form" action="index.php" method="POST">
                 <div class="input-group" style="margin-bottom: 5px;">
                     <label for="mail" style="display: block; margin-bottom: 5px;">Mail Adresi:</label>
                     <input type="text" id="mail" name="mail" style="width: 100%; padding: 8px;">
@@ -181,6 +183,25 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
         </div>
     </div>
+    <!-- Modal End -->
+
+    <script>
+
+        // Hata mesajı kontrolü ve modal açma
+        document.addEventListener("DOMContentLoaded", function() {
+            var error = "<?php echo isset($error) ? $error : '' ?>";
+            if (error !== '') {
+                document.getElementById('loginError').innerText = error;
+                openModal('myModal');
+            }
+        });
+
+        // Modal kapatma fonksiyonu ve hata mesajını temizleme
+        function closeAndResetModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            document.getElementById('loginError').innerText = '';
+        }
+    </script>
 
 
 
