@@ -40,9 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     header("Location: index.php");
     exit();
 }
+
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -143,130 +142,159 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Navbar End -->
 
-    <!-- Modal Start -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeAndResetModal('myModal')">×</span>
-            <h2 style="text-align: center" onclick="">Giriş Yap</h2>
-            <!-- Hata Mesajı için -->
-            <p id="loginError" style="text-align: center; color: red;"><?php echo isset($error) ? $error : ''; ?></p>
-            <form class="login-form" action="index.php" method="POST">
-                <div class="input-group" style="margin-bottom: 5px;">
-                    <label for="mail" style="display: block; margin-bottom: 5px;">Mail Adresi:</label>
-                    <input type="text" id="mail" name="mail" style="width: 100%; padding: 8px;">
-                </div>
+    <!-- Profile Start-->
+    <div class="row d-flex justify-content-center" style=" margin-top:60px; margin-bottom:60px">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <table>
+                        <tr>
+                            <center>
+                                <p class="card-title">
+                                    <?php if (isset($profile['resim_musteri'])): ?>
+                                        <img src="<?php echo base_url($profile['resim_musteri']); ?>"
+                                            alt="<?php echo $this->session->userdata('ktp'); ?>"
+                                            style="width:100px;height:100px">
+                                    <?php else: ?>
+                                    <div style="width:100px;height:100px;background-color:lightgray;"></div>
+                                <?php endif; ?>
+                                </p>
+                            </center>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5 class="card-title">Kimlik Numarası</h5>
+                            </td>
+                            <td>
+                                <p class="card-title">
+                                    <?php echo $_SESSION['kimlik_no']; ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5 class="card-title">Ad-Soyad</h5>
+                            </td>
+                            <td>
+                                <p class="card-title">
+                                    <?php echo isset($kullanici['ad']) && isset($kullanici['soyad']) ? $kullanici['ad'] . ' ' . $kullanici['soyad'] : ''; ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5 class="card-title">Email</h5>
+                            </td>
+                            <td>
+                                <p class="card-title">
+                                    <?php echo isset($kullanici['mail']) ? $kullanici['mail'] : ''; ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5 class="card-title">Telefon Numarası</h5>
+                            </td>
+                            <td>
+                                <p class="card-title">
+                                    <?php echo isset($kullanici['tel_no']) ? $profile['tel_no'] : ''; ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-12" align="center">
+                            <button data-toggle="modal" data-target="#editModal" class="btn btn-primary">Bilgilerimi
+                                Düzenle</button>
 
-                <div class="input-group" style="margin-bottom: 5px;">
-                    <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
-                    <input type="password" id="sifre" name="sifre" style="width: 100%; padding: 8px;">
-                </div>
-
-                <div class="input-group">
-                    <input type="submit" name="login_btn" value="Giriş Yap">
-                </div>
-            </form>
-            <p style="text-align: center; margin-top: 10px;">
-                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
-            </p>
-            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
-        </div>
-    </div>
-    <!-- Modal End -->
-
-    <script>
-
-        // Hata mesajı kontrolü ve modal açma
-        document.addEventListener("DOMContentLoaded", function () {
-            var error = "<?php echo isset($error) ? $error : '' ?>";
-            if (error !== '') {
-                document.getElementById('loginError').innerText = error;
-                openModal('myModal');
-            }
-        });
-
-        // Modal kapatma fonksiyonu ve hata mesajını temizleme
-        function closeAndResetModal(modalId) {
-            document.getElementById(modalId).style.display = "none";
-            document.getElementById('loginError').innerText = '';
-        }
-    </script>
-
-
-
-    <!-- Carousel Start -->
-    <div class="container-fluid p-0">
-        <div id="header-carousel" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img class="w-100" src="img/inek3.jpg" alt="Image">
-                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                        <div class="p-3" style="max-width: 900px;">
-                            <h4 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h4>
-                            <h1 class="display-3 text-white mb-md-4">LaktaFarmla verimi katla</h1>
-                            <?php if (!isset($_SESSION['ad'])): ?>
-                                <a href="#" class="btn btn-primary py-md-3 px-md-5 mt-2"
-                                    onclick="openModal('myModal')">Giriş Yap</a>
-                            <?php endif; ?>
+                            <a href="<?php echo base_url('profil/changepassword/' . (isset($kullanici['kullanici_id']) ? $kullanici['kullanici_id'] : '')); ?>"
+                                class="btn btn-primary">Şifremi Değiştir</a>
                         </div>
                     </div>
                 </div>
-
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Destination Start -->
-    <div class="container-fluid py-5">
-        <div class="container pt-5 pb-3">
-            <div class="text-center mb-3 pb-3">
-                <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Laktasyon Süreci</h6>
-                <h1>Yılda Bir Buzağı Ve Maksimum Süt İçin</h1>
-            </div>
-            <div class="row">
-                <div class="col-lg-6  mb-6">
-                    <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek1.jpg" alt="">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Pervis Periyodu</h5>
-                            <span>85 Gün</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6  mb-6">
-                    <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek8.jpg" alt="">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Kuru Dönem</h5>
-                            <span>60 Gün</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6  mb-6">
-                    <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek3.jpg" alt="">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Sağım</h5>
-                            <span>305 Gün</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6  mb-6">
-                    <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek9.jpg" alt="">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Gebelik süresi</h5>
-                            <span>280 gün</span>
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
-    <!-- Destination Start -->
 
 
+    <!-- Profile End-->
+
+    <!-- Profile Edit Start-->
+
+
+
+    <!-- Buton -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Bilgilerimi Düzenle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="editprofile.php" method="post" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="ktp" class="control-label">Kimlik Numarası</label>
+                                        <input type="text" class="form-control" name="ktp"
+                                            value="<?php echo isset($profile['no_ktp_musteri']) ? $profile['no_ktp_musteri'] : ''; ?>">
+                                        <input type="hidden" name="kode"
+                                            value="<?php echo isset($profile['kd_musteri']) ? $profile['kd_musteri'] : ''; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nama" class="control-label">Ad-Soyad</label>
+                                        <input type="text" class="form-control" name="nama"
+                                            value="<?php echo isset($profile['isim_musteri']) ? $profile['isim_musteri'] : ''; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email" class="control-label">Email</label>
+                                        <input type="email" class="form-control" name="email"
+                                            value="<?php echo isset($profile['email_musteri']) ? $profile['email_musteri'] : ''; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hp" class="control-label">Telefon Numarası</label>
+                                        <input type="text" class="form-control" name="hp"
+                                            value="<?php echo isset($profile['telpon_musteri']) ? $profile['telpon_musteri'] : ''; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="alamat" class="control-label">Adres</label>
+                                        <input type="text" class="form-control" name="alamat"
+                                            value="<?php echo isset($profile['adres_musteri']) ? $profile['adres_musteri'] : ''; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Profil Fotoğrafı</label>
+                                        <img src="<?php echo isset($profile['resim_musteri']) ? $profile['resim_musteri'] : ''; ?>"
+                                            alt="<?php echo isset($profile['no_ktp_musteri']) ? $profile['no_ktp_musteri'] : ''; ?>"
+                                            style="width:150px;height:150px">
+                                        <input type="file" class="form-control"
+                                            value="<?php echo isset($profile['isim_musteri']) ? $profile['isim_musteri'] : ''; ?>"
+                                            name="img">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Vazgeç</button>
+                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Profile Edit End -->
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -322,6 +350,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <script src="lib/tempusdominus/js/moment.min.js"></script>
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
     <!-- Contact Javascript File -->
     <script src="mail/jqBootstrapValidation.min.js"></script>
@@ -329,7 +363,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
-
+    <script>
+        function openEditModal() {
+            $('#editModal').modal('show');
+        }
+    </script>
 </body>
 
 </html>

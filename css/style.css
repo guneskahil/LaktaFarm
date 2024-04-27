@@ -99,6 +99,53 @@ section {
   margin: 0 auto;
 }
 
+/* Modal arkaplanı */
+.modal {
+  display: none;
+  /* Modalı varsayılan olarak gizle */
+  position: fixed;
+  /* Sabit konumlandırma */
+  z-index: 1;
+  /* Diğer elementlerin önünde */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Ekranın genişliği */
+  height: 100%;
+  /* Ekranın yüksekliği */
+  overflow: auto;
+  /* Diğer içerikler ekran dışına çıkarsa kaydırma çubuğu ekle */
+  background-color: rgb(0, 0, 0);
+  /* Siyah arkaplan rengi */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Saydamlık ekleyin */
+}
+
+/* Modal içeriği */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  /* Orta konumlandırma */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  /* Modalın genişliği */
+}
+
+/* Kapatma düğmesi */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 body {
   margin: 0;
