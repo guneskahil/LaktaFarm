@@ -20,6 +20,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            $_SESSION['kimlik_no'] = $kullanici['kimlik_no']; // Kimlik numarasını oturum verilerine kaydet
+            $_SESSION['soyad'] = $kullanici['soyad'];
+            $_SESSION['mail'] = $kullanici['mail'];
+            $_SESSION['tel_no'] = $kullanici['tel_no']; // Kullanıcının adını oturum verilerine kaydet
             header("Location: index.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
@@ -74,11 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 </head>
 
 <body>
-    <!-- db connection start-->
-
-
-    <!-- db connection end-->
-
 
     <!-- Topbar Start -->
     <div class="container-fluid bg-light pt-3 d-none d-lg-block">
@@ -117,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <a href="gunlukKontrol.html" class="dropdown-item">Günlük Takip</a>
                                 <a href="dollemeTakip.html" class="dropdown-item">Dölleme Takip</a>
                                 <a href="destination.html" class="dropdown-item">Gebe Takip</a>
-                                <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                <a href="single.php" class="dropdown-item">Kuru Dönem Takip</a>
                                 <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
@@ -127,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Merhaba, <?php echo $_SESSION['ad']; ?>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="profil.php">Profilim</a>
                                     <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
                                 </div>
@@ -145,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
     <!-- Modal Start -->
     <div id="myModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="border-radius:20px !important">
             <span class="close" onclick="closeAndResetModal('myModal')">×</span>
             <h2 style="text-align: center" onclick="">Giriş Yap</h2>
             <!-- Hata Mesajı için -->
@@ -185,10 +184,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
         });
 
         // Modal kapatma fonksiyonu ve hata mesajını temizleme
+
         function closeAndResetModal(modalId) {
             document.getElementById(modalId).style.display = "none";
-            document.getElementById('loginError').innerText = '';
+            document.getElementById('editInfoError').innerText = ''; // Hata mesajını sıfırla
         }
+
     </script>
 
 

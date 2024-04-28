@@ -1,8 +1,9 @@
 <?php
+session_start();
 // config.php dosyasını dahil et
 include_once "config.php";
 
-session_start();
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = $_POST['mail'];
@@ -20,6 +21,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            $_SESSION['kimlik_no'] = $kullanici['kimlik_no']; // Kimlik numarasını oturum verilerine kaydet
+            $_SESSION['soyad'] = $kullanici['soyad'];
+            $_SESSION['mail'] = $kullanici['mail'];
+            $_SESSION['tel_no'] = $kullanici['tel_no'];
             header("Location: index.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
@@ -73,10 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 </head>
 
 <body>
-    <!-- db connection start-->
-
-
-    <!-- db connection end-->
 
 
     <!-- Topbar Start -->
@@ -126,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Merhaba, <?php echo $_SESSION['ad']; ?>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="profil.php">Profilim</a>
                                     <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
                                 </div>
@@ -143,152 +144,122 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <!-- Navbar End -->
 
     <!-- Profile Start-->
-    <div class="row d-flex justify-content-center" style=" margin-top:60px; margin-bottom:60px">
+    <div class="row justify-content-center py-5">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
                     <table>
                         <tr>
-                            <center>
+                            <div style="text-align: center;">
                                 <p class="card-title">
-                                    <?php if (isset($profile['resim_musteri'])): ?>
-                                        <img src="<?php echo base_url($profile['resim_musteri']); ?>"
-                                            alt="<?php echo $this->session->userdata('ktp'); ?>"
-                                            style="width:100px;height:100px">
-                                    <?php else: ?>
-                                    <div style="width:100px;height:100px;background-color:lightgray;"></div>
-                                <?php endif; ?>
+                                <div
+                                    style="width:100px;height:100px;background-color:lightgray; display: inline-block;">
+                                </div>
                                 </p>
-                            </center>
+                            </div>
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="card-title">Kimlik Numarası</h5>
+                                <h5 class="card-title">Kimlik Numarası </h5>
                             </td>
                             <td>
                                 <p class="card-title">
-                                    <?php echo $_SESSION['kimlik_no']; ?>
+                                    <?php echo isset($_SESSION['kimlik_no']) ? $_SESSION['kimlik_no'] : ''; ?>
                                 </p>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="card-title">Ad-Soyad</h5>
+                                <h5 class="card-title">Ad-Soyad </h5>
                             </td>
                             <td>
                                 <p class="card-title">
-                                    <?php echo isset($kullanici['ad']) && isset($kullanici['soyad']) ? $kullanici['ad'] . ' ' . $kullanici['soyad'] : ''; ?>
+                                    <?php echo isset($_SESSION['ad']) ? $_SESSION['ad'] : ''; ?>
+                                    <?php echo isset($_SESSION['soyad']) ? $_SESSION['soyad'] : ''; ?>
                                 </p>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="card-title">Email</h5>
+                                <h5 class="card-title">Email </h5>
                             </td>
                             <td>
                                 <p class="card-title">
-                                    <?php echo isset($kullanici['mail']) ? $kullanici['mail'] : ''; ?>
+                                    <?php echo isset($_SESSION['mail']) ? $_SESSION['mail'] : ''; ?>
                                 </p>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="card-title">Telefon Numarası</h5>
+                                <h5 class="card-title">Telefon Numarası </h5>
                             </td>
                             <td>
                                 <p class="card-title">
-                                    <?php echo isset($kullanici['tel_no']) ? $profile['tel_no'] : ''; ?>
+                                    <?php echo isset($_SESSION['tel_no']) ? $_SESSION['tel_no'] : ''; ?>
                                 </p>
                             </td>
                         </tr>
                     </table>
-                    <div class="row">
-                        <div class="col-sm-12" align="center">
-                            <button data-toggle="modal" data-target="#editModal" class="btn btn-primary">Bilgilerimi
+                    <div class="row justify-content-center">
+                        <div class="col-sm-12 text-center">
+                            <button id="editProfileBtn" class="btn btn-primary" onclick="openEditModal()">Bilgilerimi
                                 Düzenle</button>
-
-                            <a href="<?php echo base_url('profil/changepassword/' . (isset($kullanici['kullanici_id']) ? $kullanici['kullanici_id'] : '')); ?>"
-                                class="btn btn-primary">Şifremi Değiştir</a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
-
-
     <!-- Profile End-->
 
     <!-- Profile Edit Start-->
+    <div id="bilgilerimiDuzenleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Bilgilerimi Düzenle</h5>
+                <span class="close" onclick="closeAndResetModal('bilgilerimiDuzenleModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" enctype="multipart/form-data">
 
-
-
-    <!-- Buton -->
-
-    <!-- Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Bilgilerimi Düzenle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="editprofile.php" method="post" enctype="multipart/form-data">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="ktp" class="control-label">Kimlik Numarası</label>
-                                        <input type="text" class="form-control" name="ktp"
-                                            value="<?php echo isset($profile['no_ktp_musteri']) ? $profile['no_ktp_musteri'] : ''; ?>">
-                                        <input type="hidden" name="kode"
-                                            value="<?php echo isset($profile['kd_musteri']) ? $profile['kd_musteri'] : ''; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="nama" class="control-label">Ad-Soyad</label>
-                                        <input type="text" class="form-control" name="nama"
-                                            value="<?php echo isset($profile['isim_musteri']) ? $profile['isim_musteri'] : ''; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="email" class="control-label">Email</label>
-                                        <input type="email" class="form-control" name="email"
-                                            value="<?php echo isset($profile['email_musteri']) ? $profile['email_musteri'] : ''; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="hp" class="control-label">Telefon Numarası</label>
-                                        <input type="text" class="form-control" name="hp"
-                                            value="<?php echo isset($profile['telpon_musteri']) ? $profile['telpon_musteri'] : ''; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamat" class="control-label">Adres</label>
-                                        <input type="text" class="form-control" name="alamat"
-                                            value="<?php echo isset($profile['adres_musteri']) ? $profile['adres_musteri'] : ''; ?>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Profil Fotoğrafı</label>
-                                        <img src="<?php echo isset($profile['resim_musteri']) ? $profile['resim_musteri'] : ''; ?>"
-                                            alt="<?php echo isset($profile['no_ktp_musteri']) ? $profile['no_ktp_musteri'] : ''; ?>"
-                                            style="width:150px;height:150px">
-                                        <input type="file" class="form-control"
-                                            value="<?php echo isset($profile['isim_musteri']) ? $profile['isim_musteri'] : ''; ?>"
-                                            name="img">
-                                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-14">
+                                <div class="row form-group">
+                                    <label for="ktp" class="control-label">Kimlik Numarası</label>
+                                    <input type="text" class="form-control" name="ktp"
+                                        value="<?php echo $_SESSION['kimlik_no']; ?>">
+                                    <input type="hidden" name="kode" value="<?php echo $kullanici['kimlik_no']; ?>">
+                                </div>
+                                <div class="row form-group">
+                                    <label for="nama" class="control-label">Ad-Soyad</label>
+                                    <input type="text" class="form-control" name="nama"
+                                        value="<?php echo $_SESSION['ad']; ?>">
+                                </div>
+                                <div class="row form-group">
+                                    <label for="email" class="control-label">Email</label>
+                                    <input type="email" class="form-control" name="email"
+                                        value="<?php echo $_SESSION['mail']; ?>">
+                                </div>
+                                <div class="row form-group">
+                                    <label for="hp" class="control-label">Telefon Numarası</label>
+                                    <input type="text" class="form-control" name="hp"
+                                        value="<?php echo $_SESSION['tel_no']; ?>">
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Vazgeç</button>
-                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Vazgeç</button>
+                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
+
 
 
 
@@ -350,12 +321,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <script src="lib/tempusdominus/js/moment.min.js"></script>
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
     <!-- Contact Javascript File -->
     <script src="mail/jqBootstrapValidation.min.js"></script>
@@ -365,9 +330,26 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <script src="js/main.js"></script>
     <script>
         function openEditModal() {
-            $('#editModal').modal('show');
+            var modal = document.getElementById('bilgilerimiDuzenleModal');
+            modal.style.display = 'block';
+
+            // Kullanıcı bilgilerini modal içine yükle
+            document.getElementById('ktp').value = '<?php echo isset($_SESSION['kimlik_no']) ? $_SESSION['kimlik_no'] : ''; ?>';
+            document.getElementById('nama').value = '<?php echo isset($_SESSION['ad']) ? $_SESSION['ad'] : ''; ?>';
+            document.getElementById('email').value = '<?php echo isset($_SESSION['mail']) ? $_SESSION['mail'] : ''; ?>';
+            document.getElementById('hp').value = '<?php echo isset($_SESSION['tel_no']) ? $_SESSION['tel_no'] : ''; ?>';
         }
+
+
+
+        function closeAndResetModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            document.getElementById('editInfoError').innerText = ''; // Hata mesajını sıfırla
+        }
+
+
     </script>
+
 </body>
 
 </html>
