@@ -123,8 +123,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <div class="dropdown-menu border-0 rounded-0 m-0">
                                     <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
                                     <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
-                                    <a href="destination.html" class="dropdown-item">Gebe Takip</a>
-                                    <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                    <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
+                                    <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
                                 </div>
                             </div>
 

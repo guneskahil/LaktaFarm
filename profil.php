@@ -106,12 +106,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-    <!-- Navbar Start -->
-    <div class="container-fluid position-relative nav-bar p-0">
+ <!-- Navbar Start -->
+ <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
-                <a href="" class="navbar-brand">
+                <a href="anaSayfa.php" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -119,15 +119,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="index.php" class="nav-item nav-link active">Ana Sayfa</a>
+                        <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
 
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="service.php" class="dropdown-item">Pervis Periyodu</a>
-                                <a href="single.html" class="dropdown-item">Kuru Dönem</a>
-                                <a href="destination.html" class="dropdown-item">Sağım</a>
-                                <a href="guide.html" class="dropdown-item">Gebelik</a>
+                                <a href="servisPeriyoduMetin.php" class="dropdown-item">Servis Periyodu</a>
+                                <a href="kuruDonemMetin.php" class="dropdown-item">Kuru Dönem Periyodu</a>
+                                <a href="sagimMetin.php" class="dropdown-item">Sağım Periyodu</a>
+                                <a href="gebelikMetin.php" class="dropdown-item">Gebelik Periyodu</a>
                             </div>
                         </div>
                         <?php if (isset($_SESSION['ad'])): ?>
@@ -137,8 +137,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <div class="dropdown-menu border-0 rounded-0 m-0">
                                     <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
                                     <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
-                                    <a href="destination.html" class="dropdown-item">Gebe Takip</a>
-                                    <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                    <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
+                                    <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
                                 </div>
                             </div>
 

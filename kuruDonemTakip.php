@@ -92,8 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-    <!-- Navbar Start -->
-    <div class="container-fluid position-relative nav-bar p-0">
+ <!-- Navbar Start -->
+ <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -123,8 +123,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <div class="dropdown-menu border-0 rounded-0 m-0">
                                     <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
                                     <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
-                                    <a href="destination.html" class="dropdown-item">Gebe Takip</a>
-                                    <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                    <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
+                                    <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
                                 </div>
                             </div>
 
