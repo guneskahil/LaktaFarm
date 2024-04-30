@@ -3,38 +3,40 @@ session_start();
 // config.php dosyasını dahil et
 include_once "config.php";
 
-
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mail = $_POST['mail'];
-    $sifre = $_POST['sifre'];
+    // Form verilerini al
+    $kimlik_no = $_POST['ktp'];
+    $ad = $_POST['nama'];
+    $mail = $_POST['email'];
+    $tel_no = $_POST['hp'];
 
+    // Veritabanına bağlan
     $db = dbBaglantisi();
 
+    // Veritabanında kullanıcı bilgilerini güncelle
     if ($db instanceof PDO) {
-        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
+        $query = $db->prepare("UPDATE kullanici SET ad = :ad, mail = :mail, tel_no = :tel_no WHERE kimlik_no = :kimlik_no");
+        $query->bindParam(':ad', $ad);
         $query->bindParam(':mail', $mail);
-        $query->bindParam(':sifre', $sifre);
+        $query->bindParam(':tel_no', $tel_no);
+        $query->bindParam(':kimlik_no', $kimlik_no);
         $query->execute();
-        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
 
-        if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            $_SESSION['kimlik_no'] = $kullanici['kimlik_no']; // Kimlik numarasını oturum verilerine kaydet
-            $_SESSION['soyad'] = $kullanici['soyad'];
-            $_SESSION['mail'] = $kullanici['mail'];
-            $_SESSION['tel_no'] = $kullanici['tel_no'];
-            header("Location: index.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
-        } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
-            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
-        }
+        // Oturum verilerini güncelle
+        $_SESSION['ad'] = $ad;
+        $_SESSION['mail'] = $mail;
+        $_SESSION['tel_no'] = $tel_no;
+
+
     } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
-        $error = "Veritabanı bağlantısı yapılamadı.";
+        // Veritabanına bağlanılamadı hatası
+        http_response_code(500);
+        echo "Veritabanı bağlantısı başarısız.";
     }
+} else {
+    // POST isteği alınamadı hatası
+    http_response_code(400);
+    echo "Geçersiz istek.";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
@@ -73,7 +75,24 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Modal'ı ortalamak için */
+        .modal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
+        /* Modal'ın içeriğini ekran boyutuna sığdırmak için */
+        .modal-content {
+            width: 90%;
+            /* Modal'ın genişliğini istediğiniz gibi ayarlayabilirsiniz */
+            max-width: 500px;
+            /* Modal'ın maksimum genişliğini istediğiniz gibi ayarlayabilirsiniz */
+            overflow-y: auto;
+            /* İçerik boyutu ekranı aştığında dikey kaydırma çubuğu ekle */
+        }
+    </style>
 
 </head>
 
@@ -221,51 +240,56 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <span class="close" onclick="closeAndResetModal('bilgilerimiDuzenleModal')">×</span>
             </div>
             <div class="modal-body">
-                <form action="" method="post" enctype="multipart/form-data">
-
+                <form id="editProfileForm" action="profil.php" method="post" enctype="multipart/form-data">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-14">
                                 <div class="row form-group">
-                                    <label for="ktp" class="control-label">Kimlik Numarası</label>
-                                    <input type="text" class="form-control" name="ktp"
+                                    <label for="kimlik_no" class="control-label">Kimlik Numarası</label>
+                                    <input type="text" class="form-control" id="kimlik_no" name="kimlik_no"
                                         value="<?php echo $_SESSION['kimlik_no']; ?>">
-                                    <input type="hidden" name="kode" value="<?php echo $kullanici['kimlik_no']; ?>">
+                                    <input type="hidden" name="kimlik_no"
+                                        value="<?php echo $kullanici['kimlik_no']; ?>">
                                 </div>
                                 <div class="row form-group">
-                                    <label for="nama" class="control-label">Ad-Soyad</label>
-                                    <input type="text" class="form-control" name="nama"
+                                    <label for="ad" class="control-label">Ad-Soyad</label>
+                                    <input type="text" class="form-control" id="kimlik_no" name="kimlik_no"
+                                        value="<?php echo $_SESSION['ad']; ?>">
+                                    <input type="hidden" class="form-control" id="ad" name="ad"
                                         value="<?php echo $_SESSION['ad']; ?>">
                                 </div>
                                 <div class="row form-group">
-                                    <label for="email" class="control-label">Email</label>
-                                    <input type="email" class="form-control" name="email"
+                                    <label for="mail" class="control-label">Email</label>
+                                    <input type="text" class="form-control" id="kimlik_no" name="kimlik_no"
+                                        value="<?php echo $_SESSION['mail']; ?>">
+                                    <input type="hidden" class="form-control" id="mail" name="mail"
                                         value="<?php echo $_SESSION['mail']; ?>">
                                 </div>
                                 <div class="row form-group">
-                                    <label for="hp" class="control-label">Telefon Numarası</label>
-                                    <input type="text" class="form-control" name="hp"
+                                    <label for="tel_no" class="control-label">Telefon Numarası</label>
+                                    <input type="text" class="form-control" id="kimlik_no" name="kimlik_no"
+                                        value="<?php echo $_SESSION['tel_no']; ?>">
+                                    <input type="hidden" class="form-control" id="tel_no" name="tel_no"
                                         value="<?php echo $_SESSION['tel_no']; ?>">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Vazgeç</button>
-                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"
+                            onclick="closeAndResetModal('bilgilerimiDuzenleModal')">Vazgeç</button>
+                        <button type="button" class="btn btn-primary" onclick="saveChanges()">Değişiklikleri
+                            Kaydet</button>
+
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 
-
-
-
-
-
-
     <!-- Profile Edit End -->
+
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -334,21 +358,66 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             modal.style.display = 'block';
 
             // Kullanıcı bilgilerini modal içine yükle
-            document.getElementById('ktp').value = '<?php echo isset($_SESSION['kimlik_no']) ? $_SESSION['kimlik_no'] : ''; ?>';
-            document.getElementById('nama').value = '<?php echo isset($_SESSION['ad']) ? $_SESSION['ad'] : ''; ?>';
-            document.getElementById('email').value = '<?php echo isset($_SESSION['mail']) ? $_SESSION['mail'] : ''; ?>';
-            document.getElementById('hp').value = '<?php echo isset($_SESSION['tel_no']) ? $_SESSION['tel_no'] : ''; ?>';
+            document.getElementById('kimlik_no').value = '<?php echo isset($_SESSION['kimlik_no']) ? $_SESSION['kimlik_no'] : ''; ?>';
+            document.getElementById('ad').value = '<?php echo isset($_SESSION['ad']) ? $_SESSION['ad'] : ''; ?>';
+            document.getElementById('mail').value = '<?php echo isset($_SESSION['mail']) ? $_SESSION['mail'] : ''; ?>';
+            document.getElementById('tel_no').value = '<?php echo isset($_SESSION['tel_no']) ? $_SESSION['tel_no'] : ''; ?>';
         }
 
 
 
+        // Değişiklikleri kaydetme işlevi
+        function saveChanges() {
+            var kimlik_no = document.getElementById('kimlik_no').value;
+            var ad = document.getElementById('ad').value;
+            var mail = document.getElementById('mail').value;
+            var tel_no = document.getElementById('tel_no').value;
+
+            // Form verilerini kontrol et
+            if (kimlik_no === '' || ad === '' || mail === '' || tel_no === '') {
+                alert("Lütfen tüm alanları doldurun.");
+                return;
+            }
+
+            // Fetch API ile POST isteği gönder
+            fetch("profil_guncelle.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    kimlik_no: kimlik_no,
+                    ad: ad,
+                    mail: mail,
+                    tel_no: tel_no
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Başarılı bir şekilde güncellendiğinde modalı kapat
+                        closeAndResetModal("bilgilerimiDuzenleModal");
+                        // Profil sayfasını yeniden yükle
+                        window.location.reload();
+                    } else {
+                        throw new Error("Bir hata oluştu.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Hata:", error);
+                    // Hata mesajını kullanıcıya göster
+                    alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                });
+        }
+
+        // Modalı kapatma işlevi
         function closeAndResetModal(modalId) {
             document.getElementById(modalId).style.display = "none";
-            document.getElementById('editInfoError').innerText = ''; // Hata mesajını sıfırla
+            // Formu sıfırla
+            document.getElementById("editProfileForm").reset();
         }
 
-
     </script>
+
 
 </body>
 
