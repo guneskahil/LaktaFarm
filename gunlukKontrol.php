@@ -47,7 +47,7 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="index.html" class="nav-item nav-link">Home</a>
+                        <a href="index.php" class="nav-item nav-link">Home</a>
                         <a href="about.html" class="nav-item nav-link">About</a>
                         <a href="service.html" class="nav-item nav-link">Services</a>
                         <a href="package.html" class="nav-item nav-link">Tour Packages</a>
@@ -115,7 +115,7 @@
                                 <td>Döngü Bilgisi 1</td>
                                 <td>Kg Bilgisi 1</td>
                                 <td>Süt Bilgisi 1</td>
-                                <td><a href="dollemeDetay.html" class="btn btn-primary">Detay</a></td>
+                                <td><a href="inekdetay.html" class="btn btn-primary">Detay</a></td>
                             </tr>
                         </tbody>
                     </table>
