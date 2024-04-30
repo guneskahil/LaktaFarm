@@ -199,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
         <div id="header-carousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img class="w-100" src="img/inek3.jpg" alt="Image">
+                    <img class="w-100" src="img/çiftlik.jpg" alt="Image">
                     <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                         <div class="p-3" style="max-width: 900px;">
                             <h4 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h4>
@@ -227,41 +227,40 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <div class="row">
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek1.jpg" alt="">
+                        <img class="img-fluid" src="img/servis1.jpeg" alt="Servis Periyodu">
                         <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Pervis Periyodu</h5>
+                            <h5 class="text-white">Servis Periyodu</h5>
                             <span>85 Gün</span>
                         </a>
                     </div>
                 </div>
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek8.jpg" alt="">
+                        <img class="img-fluid" src="img/gebe.jpeg" alt="Gebelik Periyodu">
                         <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Kuru Dönem</h5>
+                            <h5 class="text-white">Gebelik Periyodu </h5>
+                            <span>280 gün</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6  mb-6">
+                    <div class="destination-item position-relative overflow-hidden mb-2">
+                        <img class="img-fluid" src="img/kuruda.jpeg" alt="Kuru Dönem Periyodu">
+                        <a class="destination-overlay text-white text-decoration-none" href="">
+                            <h5 class="text-white">Kuru Dönem Periyodu</h5>
                             <span>60 Gün</span>
                         </a>
                     </div>
                 </div>
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek3.jpg" alt="">
+                        <img class="img-fluid" src="img/sağımsa3.jpeg" alt="Sağım Periyodu" style="height: %80px;">
                         <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Sağım</h5>
+                            <h5 class="text-white">Sağım Periyodu</h5>
                             <span>305 Gün</span>
                         </a>
                     </div>
                 </div>
-                <div class="col-lg-6  mb-6">
-                    <div class="destination-item position-relative overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/inek9.jpg" alt="">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
-                            <h5 class="text-white">Gebelik süresi</h5>
-                            <span>280 gün</span>
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

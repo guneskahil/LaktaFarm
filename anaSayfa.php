@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Merhaba, <?php echo $_SESSION['ad']; ?>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="profil.php">Profilim</a>
                                     <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
                                 </div>
@@ -139,7 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                         <?php else: ?>
                             <a href="#" class="nav-item nav-link" onclick="openModal('myModal')">Giriş Yap</a>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </nav>
@@ -206,20 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <div class="row">
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/package-1.jpg" alt="">
-                        <div class="p-4">
-                            <a class="h5 text-decoration-none" href="">Kuruda</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="m-0">5</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/package-2.jpg" alt="">
+                        <img class="img-fluid" src="img/anasayfaSagımda1.jpeg" alt="">
                         <div class="p-4">
                             <a class="h5 text-decoration-none" href="">Sağımda</a>
                             <div class="border-top mt-4 pt-4">
@@ -232,7 +218,20 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/package-3.jpg" alt="">
+                        <img class="img-fluid" src="img/anasayfaKuruda.jpeg" alt="">
+                        <div class="p-4">
+                            <a class="h5 text-decoration-none" href="">Kuruda</a>
+                            <div class="border-top mt-4 pt-4">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="m-0">5</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="package-item bg-white mb-2">
+                        <img class="img-fluid" src="img/anasayfaGebe.jpeg" alt="">
                         <div class="p-4">
                             <a class="h5 text-decoration-none" href="">Gebe</a>
                             <div class="border-top mt-4 pt-4">
@@ -245,7 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/package-4.jpg" alt="">
+                        <img class="img-fluid" src="img/anasayfaServis.jpeg" alt="">
                         <div class="p-4">
                             <a class="h5 text-decoration-none" href="">Servis</a>
                             <div class="border-top mt-4 pt-4">
