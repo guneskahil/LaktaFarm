@@ -324,10 +324,21 @@ LEFT JOIN
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php echo isset($row['gun_farki'])
-                                                    && $row['gebe_durum'] !== 'Sürüden Çikarilmali' ?
-                                                    $row['gun_farki'] : '-'; ?>
+                                                <?php
+                                                if (isset($row['gun_farki']) && $row['gebe_durum'] !== 'Sürüden Çikarilmali') {
+                                                    if ($row['sut_durum'] === 'Kuru Dönem') {
+                                                        // Kuru dönemdeyken gun_farki hesaplaması
+                                                        echo $row['gun_farki'] - 305;
+                                                    } else {
+                                                        // Diğer durumlarda gun_farki direkt olarak gösterilsin
+                                                        echo $row['gun_farki'];
+                                                    }
+                                                } else {
+                                                    echo '-';
+                                                }
+                                                ?>
                                             </td>
+
                                             <td><?php echo $row['kilo']; ?></td>
                                             <td><?php echo $row['sut_miktar']; ?></td>
                                             <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
