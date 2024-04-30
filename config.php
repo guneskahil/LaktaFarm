@@ -10,9 +10,12 @@ function dbBaglantisi()
 
     try {
         $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
+        // Hata modunu ayarlama
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $db;
     } catch (PDOException $e) {
-        // Veritabanı bağlantısı başarısız olduğunda hata mesajını döndürme
+        // Bağlantı hatası durumunda hata mesajını ekrana yazdırma
+        echo "Bağlantı hatası: " . $e->getMessage();
         return null;
     }
 }

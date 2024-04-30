@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = $_POST['mail'];
     $sifre = $_POST['sifre'];
 
-    $db = dbBaglantisi();
+    $db = dbBaglantisi(); // Veritabanı bağlantısını sağla
 
     if ($db instanceof PDO) {
         $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
@@ -20,6 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id']; // Kullanıcının id'sini oturum verilerine kaydet
             header("Location: index.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
@@ -41,15 +42,61 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     exit();
 }
 
+$db = dbBaglantisi();
+if ($db instanceof PDO) {
+    try {
+        // SQL sorgusu
+        $sql = "SELECT 
+            i.QR,
+            i.inek_id,
+            i.ad,
+            i.dogurma_tarihi,
+            d.dollenme_durumu,
+            CASE 
+                WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN 'Servis Periyodunda'
+                WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodunda'
+                ELSE 'Sürüden Çıkarılmalı'
+            END AS durum,
+            CASE 
+                WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE())
+                WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
+                ELSE NULL
+            END AS gun
+        FROM 
+            inek i
+        LEFT JOIN 
+            dollenme d ON i.inek_id = d.inek_id
+        WHERE
+            i.kullanici_id = :kullanici_id";
 
+        // SQL sorgusunu hazırlama
+        $stmt = $db->prepare($sql);
 
+        // Oturumda kullanıcı id'sini al
+        $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
 
+        // SQL sorgusunu çalıştırma
+        $stmt->execute([':kullanici_id' => $kullanici_id]);
 
+        // Sonuçları alma
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
+        if (!$result) {
+            echo "Sonuç bulunamadı.";
+        }
+    } catch (PDOException $e) {
+        // Hata durumunda hata mesajını ekrana yazdırma
+        echo "Hata: " . $e->getMessage();
+    }
+} else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+}
 ?>
 
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8">
@@ -97,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
-                <a href="anaSayfa.php" class="navbar-brand">
+                <a href="" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -105,25 +152,25 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
+                        <a href="index.php" class="nav-item nav-link active">Ana Sayfa</a>
 
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="servisPeriyoduMetin.php" class="dropdown-item">Servis Periyodu</a>
-                                <a href="kuruDonemMetin.php" class="dropdown-item">Kuru Dönem Periyodu</a>
-                                <a href="sagimMetin.php" class="dropdown-item">Sağım Periyodu</a>
-                                <a href="gebelikMetin.php" class="dropdown-item">Gebelik Periyodu</a>
+                                <a href="service.php" class="dropdown-item">Pervis Periyodu</a>
+                                <a href="single.html" class="dropdown-item">Kuru Dönem</a>
+                                <a href="destination.html" class="dropdown-item">Sağım</a>
+                                <a href="guide.html" class="dropdown-item">Gebelik</a>
                             </div>
                         </div>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">İnekler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
-                                <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
-                                <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
-                                <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
-                                <a href="inekKayit.php" class="dropdown-item">İnek Kayıt</a>
+                                <a href="gunlukKontrol.html" class="dropdown-item">Günlük Takip</a>
+                                <a href="dollemeTakip.html" class="dropdown-item">Dölleme Takip</a>
+                                <a href="destination.html" class="dropdown-item">Gebe Takip</a>
+                                <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
                         <?php if (isset($_SESSION['ad'])): ?>
@@ -132,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Merhaba, <?php echo $_SESSION['ad']; ?>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="profil.php">Profilim</a>
                                     <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
                                 </div>
@@ -140,7 +187,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                         <?php else: ?>
                             <a href="#" class="nav-item nav-link" onclick="openModal('myModal')">Giriş Yap</a>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </nav>
@@ -149,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <!-- Navbar End -->
 
     <!-- Modal Start -->
-    <div id="myModal" class="modal" >
+    <div id="myModal" class="modal">
         <div class="modal-content" style="border-radius: 20px !important;">
             <span class="close" onclick="closeAndResetModal('myModal')">×</span>
             <h2 style="text-align: center " onclick="">Giriş Yap</h2>
@@ -198,8 +244,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
 
-<!-- Header Start -->
-<div class="container-fluid page-header">
+    <!-- Header Start -->
+    <div class="container-fluid page-header">
         <div class="container">
             <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
 
@@ -211,50 +257,62 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Header End -->
 
-
     <!-- Booking Start -->
-
-    <!-- Booking End -->
-
-
-    <!-- Contact Start -->
     <div class="container-fluid py-5">
         <div class="container py-5">
             <div class="justify-content-center">
-                <div class="text-center mb-3 pb-3">
-                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Günlük Kontrol</h6>
-                </div>
-                <div class="row justify-content-center">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Adı</th>
-                                <th>Döngü</th>
-                                <th>Kg</th>
-                                <th>Süt</th>
-                                <th>Detay</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>İnek Adı 1</td>
-                                <td>Döngü Bilgisi 1</td>
-                                <td>Kg Bilgisi 1</td>
-                                <td>Süt Bilgisi 1</td>
-                                <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase text-primary mb-3 row justify-content-center"
+                            style="letter-spacing: 5px;">Dölleme
+                            Takip Tablosu</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>QR</th>
+                                        <th>Adı</th>
+                                        <th>Döngü Adı</th>
+                                        <th>Döngünün Kaçıncı Günü</th>
+                                        <th>Detay</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($result as $row): ?>
+                                        <tr>
+                                            <td>
+                                                <?php if (isset($row['QR'])): ?>
+                                                    <?php echo $row['QR']; ?>
+                                                <?php else: ?>
+                                                    QR değeri yok
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo $row['ad']; ?></td>
+                                            <td><?php echo $row['durum']; ?></td>
+                                            <td>
+                                                <?php if (isset($row['gun'])): ?>
+                                                    <?php echo $row['gun']; ?>
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Contact End -->
+    <!-- Booking End -->
 
 
- <!-- Footer Start -->
- <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
         <div class="row pt-5">
             <div class="col-lg-3 col-md-6 mb-5">
                 <a href="" class="navbar-brand">
@@ -266,20 +324,29 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <div class="col-lg-3 col-md-6 mb-5">
                 <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Döngüler</h5>
                 <div class="d-flex flex-column justify-content-start">
-                    <a class="text-white-50 mb-2" href="servisPeriyoduMetin.php"><i class="fa fa-angle-right mr-2"></i>Servis Periyodu</a>
-                    <a class="text-white-50 mb-2" href="kuruDonemMetin.php"><i class="fa fa-angle-right mr-2"></i>Kuru Dönem Periyodu</a>
-                    <a class="text-white-50 mb-2" href="sagimMetin.php"><i class="fa fa-angle-right mr-2"></i>Sağım Periyodu</a>
-                    <a class="text-white-50 mb-2" href="gebelikMetin.php"><i class="fa fa-angle-right mr-2"></i>Gebelik Periyodu</a>
+                    <a class="text-white-50 mb-2" href="servisPeriyoduMetin.php"><i
+                            class="fa fa-angle-right mr-2"></i>Servis Periyodu</a>
+                    <a class="text-white-50 mb-2" href="kuruDonemMetin.php"><i class="fa fa-angle-right mr-2"></i>Kuru
+                        Dönem Periyodu</a>
+                    <a class="text-white-50 mb-2" href="sagimMetin.php"><i class="fa fa-angle-right mr-2"></i>Sağım
+                        Periyodu</a>
+                    <a class="text-white-50 mb-2" href="gebelikMetin.php"><i class="fa fa-angle-right mr-2"></i>Gebelik
+                        Periyodu</a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
                 <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">İnekler</h5>
                 <div class="d-flex flex-column justify-content-start">
-                    <a class="text-white-50 mb-2" href="gunlukKontrol.php"><i class="fa fa-angle-right mr-2"></i>Günlük Takip</a>
-                    <a class="text-white-50 mb-2" href="gebeTakip.php"><i class="fa fa-angle-right mr-2"></i>Gebelik Takip</a>
-                    <a class="text-white-50 mb-2" href="dollemeTakip.php"><i class="fa fa-angle-right mr-2"></i>Dölleme Takip</a>
-                    <a class="text-white-50 mb-2" href="kuruDonemTakip.php"><i class="fa fa-angle-right mr-2"></i>Kuru Dönem Takip</a>
-                    <a class="text-white-50 mb-2" href="inekKayit.php"><i class="fa fa-angle-right mr-2"></i>İnek Kayıt</a>
+                    <a class="text-white-50 mb-2" href="gunlukKontrol.php"><i class="fa fa-angle-right mr-2"></i>Günlük
+                        Takip</a>
+                    <a class="text-white-50 mb-2" href="gebeTakip.php"><i class="fa fa-angle-right mr-2"></i>Gebelik
+                        Takip</a>
+                    <a class="text-white-50 mb-2" href="dollemeTakip.php"><i class="fa fa-angle-right mr-2"></i>Dölleme
+                        Takip</a>
+                    <a class="text-white-50 mb-2" href="kuruDonemTakip.php"><i class="fa fa-angle-right mr-2"></i>Kuru
+                        Dönem Takip</a>
+                    <a class="text-white-50 mb-2" href="inekKayit.php"><i class="fa fa-angle-right mr-2"></i>İnek
+                        Kayıt</a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
