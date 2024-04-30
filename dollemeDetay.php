@@ -116,30 +116,34 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <a href="gebelikMetin.php" class="dropdown-item">Gebelik Periyodu</a>
                             </div>
                         </div>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">İnekler</a>
-                            <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
-                                <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
-                                <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
-                                <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
-                            </div>
-                        </div>
                         <?php if (isset($_SESSION['ad'])): ?>
+                            <!-- Giriş yapıldığında görünecek menü -->
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">İnekler</a>
+                                <div class="dropdown-menu border-0 rounded-0 m-0">
+                                    <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
+                                    <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
+                                    <a href="destination.html" class="dropdown-item">Gebe Takip</a>
+                                    <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
+                                    <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
+                                </div>
+                            </div>
+
+                            <!-- Giriş yapıldığında görünen diğer menü -->
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Merhaba, <?php echo $_SESSION['ad']; ?>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu border-0 rounded-0 m-0" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="profil.php">Profilim</a>
                                     <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
                                 </div>
                             </div>
                         <?php else: ?>
+                            <!-- Giriş yapılmadığında görünen menü -->
                             <a href="#" class="nav-item nav-link" onclick="openModal('myModal')">Giriş Yap</a>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </nav>
