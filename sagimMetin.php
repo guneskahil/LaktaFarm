@@ -123,7 +123,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
                                 <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
                                 <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
-                                <a href="inekKayit.php" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
                         <?php if (isset($_SESSION['ad'])): ?>

@@ -110,9 +110,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="servisPeriyodu.php" class="dropdown-item">Servis Periyodu</a>
+                                <a href="servisPeriyoduMetin.php" class="dropdown-item">Servis Periyodu</a>
                                 <a href="kuruDonemMetin.php" class="dropdown-item">Kuru Dönem Periyodu</a>
-                                <a href="sagimMetin.html" class="dropdown-item">Sağım Periyodu</a>
+                                <a href="sagimMetin.php" class="dropdown-item">Sağım Periyodu</a>
                                 <a href="gebelikMetin.php" class="dropdown-item">Gebelik Periyodu</a>
                             </div>
                         </div>
@@ -123,7 +123,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
                                 <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
                                 <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
-                                <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
                         <?php if (isset($_SESSION['ad'])): ?>

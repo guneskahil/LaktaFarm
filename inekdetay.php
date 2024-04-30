@@ -203,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
 
                 <div class="d-inline-flex text-white" style="font-size: 30px;">
-                    <p class="m-0 ">Servis Periyodu Nedir?</p>
+                    <p class="m-0 ">İnek Detay</p>
                 </div>
             </div>
         </div>
@@ -211,36 +211,85 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <!-- Header End -->
 
 
-  <!-- About Start -->
-<div class="container-fluid ">
-    <div class="container pt-5">
-        <div class="row">
-            <div class="col-lg-6" >
-                <div class="position-relative h-100">
-                    <img class="position-absolute" src="img/seffafInek.webp" style="object-fit: cover; width: 500px; bottom: 180px; right: 100px;">
-                </div>
+    <!-- Contact Start -->
+    <div class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="text-center mb-3 pb-3">
+                <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;"></h6>
+                <h1>İnek Detay Bilgileri</h1>
             </div>
-            <div class="col-lg-6 pt-5 pb-lg-5">
-                <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
-                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Servis Periyodu</h6><br>
-                    <p>Büyük baş çiftlik hayvanlarının laktasyon süreci, süt üretimini ve sütün yavrularına veya insanlara sunulmasını içerir. Pervis periyodu, sütün sağım aralıkları arasında üretilmesi için geçen zaman dilimidir. Bu periyodun önemi büyüktür çünkü:<br><br>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="contact-form bg-white" style="padding: 30px;">
+                        <div id="success"></div>
+                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
 
-Sağım Düzeni ve Süt Üretimi: Pervis periyodu, hayvanların düzenli olarak sağılması ve süt üretiminin sürdürülmesi için kritik öneme sahiptir. Düzenli sağım yapıldığında, meme uyarıldığı için süt üretimi artar ve süt kalitesi korunur.<br>
-Yavru Hayvan Beslenmesi ve Gelişimi: Pervis periyodu, yavru hayvanların yeterli miktarda süt almasını sağlamak için önemlidir. Düzenli sağım aralıkları, yavruların doğru beslenmesini ve sağlıklı bir şekilde büyümesini destekler.<br>
-Hayvan Sağlığı ve Verimliliği: Düzenli sağım, hayvanların meme sağlığını korur ve süt üretimini optimize eder. Bu da hayvanların genel sağlığını korur ve verimliliğini artırır.
-<br><br>
-Ayrıca, pervis periyodu hayvan ve üretici sağlığını izlemek için önemli bir göstergedir. Sağım aralıklarının düzensizleşmesi veya süt üretiminde sorunlar olduğunda, bu durum, hayvanın veya üreticinin sağlık ve verimlilik durumunu değerlendirmek için bir işaret olabilir.</p>
+                            <div class="control-group col-md-10">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Gün</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input class="form-control p-4" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="control-group col-md-10">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Döngü</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input class="form-control p-4" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br>
+                            <div class="text-center mb-3 pb-3">
+                                <h3>Döngü Bilgisi</h3>
+                            </div>
+                            <div class="control-group col-md-10">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Kilo</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input class="form-control p-4" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="control-group col-md-10">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Süt</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input class="form-control p-4" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center" style="padding: 15px;">
+                                <button class="btn btn-primary py-3 px-4" type="submit" id="sendMessageButton">Yaşam
+                                    Payını Hesapla</button>
+                            </div>
+                            <div class="control-group align-items-center">
+                                <input class="form-control" type="text">
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<!-- About End -->
+    <!-- Contact End -->
 
 
- <!-- Footer Start -->
- <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+   <!-- Footer Start -->
+   <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
         <div class="row pt-5">
             <div class="col-lg-3 col-md-6 mb-5">
                 <a href="" class="navbar-brand">

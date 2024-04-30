@@ -123,7 +123,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                 <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
                                 <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
                                 <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
-                                <a href="inekKayit.php" class="dropdown-item">İnek Kayıt</a>
                             </div>
                         </div>
                         <?php if (isset($_SESSION['ad'])): ?>
@@ -223,17 +222,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             </div>
             <div class="col-lg-6 pt-5 pb-lg-5">
                 <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
-                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Pervis Periyodu</h6>
-                    <p>Büyük baş çiftlik hayvanlarının laktasyon süreci, süt üretimini ve bu sütün yavrularına veya insanlara sunulmasını içerir. Pervis periyodu, sütün sağım aralıkları arasında üretilmesi için geçen zaman dilimidir.<br>
+                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Gebelik Periyodu</h6><br>
+                    <p>Gebelik periyodu, bir ineğin dölleme (doğum) ile sonraki yeniden dölleme arasındaki zaman dilimini ifade eder. İneklerde gebelik periyodu genellikle yaklaşık 280 gün (ortalama 9 ay) sürer. Bu süre, ineğin gebelik süresi boyunca embriyonun gelişimini tamamlaması ve sağlıklı bir yavru doğurması için gereklidir.<br><br>
 
-                        Pervis periyodu, büyük baş çiftlik hayvanlarının yönetimi ve bakımı açısından önemlidir çünkü:<br>
-                        
-                        Sağım Düzeni ve Süt Üretimi: Pervis periyodu, hayvanların düzenli olarak sağılması ve süt üretiminin sürdürülmesi için kritik öneme sahiptir. Düzenli olarak sağım yapıldığında, meme uyarıldığı için süt üretimi artar ve süt kalitesi korunur.
-                        Yavru Hayvan Beslenmesi ve Gelişimi: Pervis periyodu, yavru hayvanların yeterli miktarda süt almasını sağlamak için önemlidir. Düzenli sağım aralıkları, yavruların doğru beslenmesini ve sağlıklı bir şekilde büyümesini destekler.
-                        Hayvan Sağlığı ve Verimliliği: Pervis periyodu, hayvanların sağlığını korumak ve verimliliğini artırmak için önemlidir. Düzenli sağım, meme sağlığını korur ve süt üretimini optimize eder.
-                        Üretici Sağlığı ve Planlama: Pervis periyodu, üreticiler için sağım sürecini planlama ve yönetme konusunda faydalıdır. Belirli aralıklarla sağım, iş akışını düzenler ve üreticinin işletmeyi verimli bir şekilde yönetmesine yardımcı olur.
-                        Pervis periyodu ayrıca hayvan ve üretici sağlığını izlemek için önemli bir göstergedir. Sağım aralıklarının düzensizleşmesi veya süt üretiminde sorunlar olduğunda, pervis periyodu değişebilir ve bu durum, hayvanın veya üreticinin sağlık ve verimlilik durumunu değerlendirmek için bir işaret olabilir.</p>
-                </div>
+Gebelik periyodu, ineklerin sağlıklı bir şekilde üreme sürecini tamamlaması için kritik öneme sahiptir. Bu süreçte ineklerin sağlığına, beslenmesine ve bakımına özen gösterilmelidir. Ayrıca, veteriner hekimler tarafından düzenli olarak yapılan muayenelerle gebeliğin sağlıklı bir şekilde ilerlediği takip edilmelidir.<br><br>
+
+Özetle, gebelik periyodu, ineğin dölleme ile sonraki yeniden dölleme arasındaki süredir ve ineklerin üreme sürecindeki önemli bir aşamadır. Bu süreçte ineklerin sağlığına ve bakımına özen gösterilmesi, sağlıklı bir doğum ve yavru ineklerin yetiştirilmesi için hayati öneme sahiptir.<br><br></p>
+ </div>
             </div>
         </div>
     </div>

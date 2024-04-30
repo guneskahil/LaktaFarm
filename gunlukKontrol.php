@@ -1,9 +1,59 @@
+<?php
+// config.php dosyasını dahil et
+include_once "config.php";
+
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $mail = $_POST['mail'];
+    $sifre = $_POST['sifre'];
+
+    $db = dbBaglantisi();
+
+    if ($db instanceof PDO) {
+        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
+        $query->bindParam(':mail', $mail);
+        $query->bindParam(':sifre', $sifre);
+        $query->execute();
+        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($kullanici) {
+            // Kullanıcı bulundu, giriş yap
+            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            header("Location: index.php"); // Ana sayfaya yönlendir
+            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+        } else {
+            // Kullanıcı bulunamadı, hata mesajı ayarla
+            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
+        }
+    } else {
+        // Veritabanına bağlanılamadı, hata mesajı ayarla
+        $error = "Veritabanı bağlantısı yapılamadı.";
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
+    // Çıkış işlemi
+    session_unset();
+    session_destroy();
+    // Ana sayfaya yönlendirme
+    header("Location: index.php");
+    exit();
+}
+
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>TRAVELER - Free Travel Website Template</title>
+    <title>LaktaFarm</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
@@ -24,9 +74,17 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+
 </head>
 
 <body>
+    <!-- db connection start-->
+
+
+    <!-- db connection end-->
+
+
     <!-- Topbar Start -->
     <div class="container-fluid bg-light pt-3 d-none d-lg-block">
         <div class="container">
@@ -34,34 +92,54 @@
     </div>
     <!-- Topbar End -->
 
-
     <!-- Navbar Start -->
     <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
-                <a href="" class="navbar-brand">
-                    <h1 class="m-0 text-primary"><span class="text-dark">LAKTA</span>FARM</h1>
+                <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
+                <a href="anaSayfa.php" class="navbar-brand">
+                    <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="index.php" class="nav-item nav-link">Home</a>
-                        <a href="about.html" class="nav-item nav-link">About</a>
-                        <a href="service.html" class="nav-item nav-link">Services</a>
-                        <a href="package.html" class="nav-item nav-link">Tour Packages</a>
+                        <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
+
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
-                                <a href="blog.html" class="dropdown-item">Blog Grid</a>
-                                <a href="single.html" class="dropdown-item">Blog Detail</a>
-                                <a href="destination.html" class="dropdown-item">Destination</a>
-                                <a href="guide.html" class="dropdown-item">Travel Guides</a>
-                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                                <a href="servisPeriyoduMetin.php" class="dropdown-item">Servis Periyodu</a>
+                                <a href="kuruDonemMetin.php" class="dropdown-item">Kuru Dönem Periyodu</a>
+                                <a href="sagimMetin.php" class="dropdown-item">Sağım Periyodu</a>
+                                <a href="gebelikMetin.php" class="dropdown-item">Gebelik Periyodu</a>
                             </div>
                         </div>
-                        <a href="contact.html" class="nav-item nav-link active">Contact</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">İnekler</a>
+                            <div class="dropdown-menu border-0 rounded-0 m-0">
+                                <a href="gunlukKontrol.php" class="dropdown-item">Günlük Takip</a>
+                                <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
+                                <a href="gebeTakip.php" class="dropdown-item">Gebe Takip</a>
+                                <a href="kuruDonemTakip.php" class="dropdown-item">Kuru Dönem Takip</a>
+                            </div>
+                        </div>
+                        <?php if (isset($_SESSION['ad'])): ?>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Merhaba, <?php echo $_SESSION['ad']; ?>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="profil.php">Profilim</a>
+                                    <a class="dropdown-item" href="?action=logout">Çıkış Yap</a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <a href="#" class="nav-item nav-link" onclick="openModal('myModal')">Giriş Yap</a>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </nav>
@@ -69,16 +147,63 @@
     </div>
     <!-- Navbar End -->
 
+    <!-- Modal Start -->
+    <div id="myModal" class="modal" >
+        <div class="modal-content" style="border-radius: 20px !important;">
+            <span class="close" onclick="closeAndResetModal('myModal')">×</span>
+            <h2 style="text-align: center " onclick="">Giriş Yap</h2>
+            <!-- Hata Mesajı için -->
+            <p id="loginError" style="text-align: center; color: red;"><?php echo isset($error) ? $error : ''; ?></p>
+            <form class="login-form" action="index.php" method="POST">
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="mail" style="display: block; margin-bottom: 5px; ">Mail Adresi:</label>
+                    <input type="text" id="mail" name="mail" style="width: 100%; padding: 8px; ">
+                </div>
 
-    <!-- Header Start -->
-    <div class="container-fluid page-header">
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label for="password" style="display: block; margin-bottom: 5px;">Şifre:</label>
+                    <input type="password" id="sifre" name="sifre" style="width: 100%; padding: 8px;">
+                </div>
+
+                <div class="input-group">
+                    <input type="submit" name="login_btn" value="Giriş Yap">
+                </div>
+            </form>
+            <p style="text-align: center; margin-top: 10px;">
+                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
+            </p>
+            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
+        </div>
+    </div>
+    <!-- Modal End -->
+
+    <script>
+
+        // Hata mesajı kontrolü ve modal açma
+        document.addEventListener("DOMContentLoaded", function () {
+            var error = "<?php echo isset($error) ? $error : '' ?>";
+            if (error !== '') {
+                document.getElementById('loginError').innerText = error;
+                openModal('myModal');
+            }
+        });
+
+        // Modal kapatma fonksiyonu ve hata mesajını temizleme
+        function closeAndResetModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            document.getElementById('loginError').innerText = '';
+        }
+    </script>
+
+
+
+<!-- Header Start -->
+<div class="container-fluid page-header">
         <div class="container">
-            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 400px">
-                <h3 class="display-4 text-white text-uppercase">Detay</h3>
-                <div class="d-inline-flex text-white">
-                    <p class="m-0 text-uppercase"><a class="text-white" href="">Ana Sayfa</a></p>
-                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
-                    <p class="m-0 text-uppercase">Detay</p>
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
+
+                <div class="d-inline-flex text-white" style="font-size: 30px;">
+                    <p class="m-0 ">Günlük Takip</p>
                 </div>
             </div>
         </div>
@@ -86,9 +211,7 @@
     <!-- Header End -->
 
 
-    <!-- Booking Start -->
-
-    <!-- Booking End -->
+ 
 
 
     <!-- Contact Start -->
@@ -115,7 +238,7 @@
                                 <td>Döngü Bilgisi 1</td>
                                 <td>Kg Bilgisi 1</td>
                                 <td>Süt Bilgisi 1</td>
-                                <td><a href="inekdetay.html" class="btn btn-primary">Detay</a></td>
+                                <td><a href="inekdetay.php" class="btn btn-primary">Detay</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -127,78 +250,46 @@
     <!-- Contact End -->
 
 
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+
+   <!-- Footer Start -->
+   <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
         <div class="row pt-5">
             <div class="col-lg-3 col-md-6 mb-5">
                 <a href="" class="navbar-brand">
-                    <h1 class="text-primary"><span class="text-white">LAKTA</span>FARM</h1>
+                    <h1 class="text-primary"><span class="text-white">Lakta</span>Farm</h1>
                 </a>
-                <p>Sed ipsum clita tempor ipsum ipsum amet sit ipsum lorem amet labore rebum lorem ipsum dolor. No sed
-                    vero lorem dolor dolor</p>
-                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
-                <div class="d-flex justify-content-start">
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
-                </div>
+                <h2>LaktaFarmla verimi katla</h2>
+
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Döngüler</h5>
                 <div class="d-flex flex-column justify-content-start">
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Destination</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Services</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Packages</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Guides</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Testimonial</a>
-                    <a class="text-white-50" href="#"><i class="fa fa-angle-right mr-2"></i>Blog</a>
+                    <a class="text-white-50 mb-2" href="servisPeriyoduMetin.php"><i class="fa fa-angle-right mr-2"></i>Servis Periyodu</a>
+                    <a class="text-white-50 mb-2" href="kuruDonemMetin.php"><i class="fa fa-angle-right mr-2"></i>Kuru Dönem Periyodu</a>
+                    <a class="text-white-50 mb-2" href="sagimMetin.php"><i class="fa fa-angle-right mr-2"></i>Sağım Periyodu</a>
+                    <a class="text-white-50 mb-2" href="gebelikMetin.php"><i class="fa fa-angle-right mr-2"></i>Gebelik Periyodu</a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Usefull Links</h5>
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">İnekler</h5>
                 <div class="d-flex flex-column justify-content-start">
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Destination</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Services</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Packages</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Guides</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Testimonial</a>
-                    <a class="text-white-50" href="#"><i class="fa fa-angle-right mr-2"></i>Blog</a>
+                    <a class="text-white-50 mb-2" href="gunlukKontrol.php"><i class="fa fa-angle-right mr-2"></i>Günlük Takip</a>
+                    <a class="text-white-50 mb-2" href="gebeTakip.php"><i class="fa fa-angle-right mr-2"></i>Gebelik Takip</a>
+                    <a class="text-white-50 mb-2" href="dollemeTakip.php"><i class="fa fa-angle-right mr-2"></i>Dölleme Takip</a>
+                    <a class="text-white-50 mb-2" href="kuruDonemTakip.php"><i class="fa fa-angle-right mr-2"></i>Kuru Dönem Takip</a>
+                    <a class="text-white-50 mb-2" href="inekKayit.php"><i class="fa fa-angle-right mr-2"></i>İnek Kayıt</a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
-                <p><i class="fa fa-map-marker-alt mr-2"></i>123 Street, New York, USA</p>
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">İletişim</h5>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>Kabaoğlu, Kocaeli Üniversitesi Umuttepe Kampüsü, A Kapısı,
+                    41001 İzmit/Kocaeli</p>
                 <p><i class="fa fa-phone-alt mr-2"></i>+012 345 67890</p>
-                <p><i class="fa fa-envelope mr-2"></i>info@example.com</p>
-                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Newsletter</h6>
-                <div class="w-100">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-light" style="padding: 25px;"
-                            placeholder="Your Email">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary px-3">Sign Up</button>
-                        </div>
-                    </div>
-                </div>
+                <p><i class="fa fa-envelope mr-2"></i>LaktaFarm@example.com</p>
             </div>
         </div>
     </div>
-    <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5"
-        style="border-color: rgba(256, 256, 256, .1) !important;">
-        <div class="row">
-            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
-                <p class="m-0 text-white-50">Copyright &copy; <a href="#">Domain</a>. All Rights Reserved.</a>
-                </p>
-            </div>
-            <div class="col-lg-6 text-center text-md-right">
-                <p class="m-0 text-white-50">Designed by <a href="https://htmlcodex.com">HTML Codex</a>
-                </p>
-            </div>
-        </div>
-    </div>
+
     <!-- Footer End -->
 
 
