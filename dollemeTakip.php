@@ -172,7 +172,6 @@ if ($db instanceof PDO) {
                                     <a href="dollemeTakip.php" class="dropdown-item">Dölleme Takip</a>
                                     <a href="destination.html" class="dropdown-item">Gebe Takip</a>
                                     <a href="single.html" class="dropdown-item">Kuru Dönem Takip</a>
-                                    <a href="inekKayit.html" class="dropdown-item">İnek Kayıt</a>
                                 </div>
                             </div>
 
