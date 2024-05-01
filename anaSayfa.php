@@ -1,7 +1,6 @@
 <?php
-// config.php dosyasını dahil et
-include_once "config.php";
 
+include_once "config.php";
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -18,32 +17,86 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $kullanici = $query->fetch(PDO::FETCH_ASSOC);
 
         if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+            $_SESSION['ad'] = $kullanici['ad'];
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
+            header("Location: index.php");
+            exit();
         } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
             $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
         }
     } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
         $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
-    // Çıkış işlemi
     session_unset();
     session_destroy();
-    // Ana sayfaya yönlendirme
     header("Location: index.php");
     exit();
 }
 
+$db = dbBaglantisi();
+if ($db instanceof PDO) {
+    try {
+        // $_SESSION['kullanici_id'] değişkeni tanımlıysa, $kullanici_id değişkenine atayalım
+        $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
 
+        // Eğer kullanıcı oturumunda kullanıcı id tanımlıysa, sorguyu hazırla ve çalıştır
+        if ($kullanici_id !== null) {
+            $sql = "SELECT
+                sut_dongu.sut_dongu_adi AS sdongu_adi,
+                COUNT(inek.inek_id) AS inek_sayisi
+            FROM
+                sut_dongu
+            LEFT JOIN
+                inek ON sut_dongu.sut_dongu_id = inek.sut_dongu_id
+            WHERE
+                inek.kullanici_id = :kullanici_id
+            GROUP BY
+                sut_dongu.sut_dongu_id,
+                sut_dongu.sut_dongu_adi";
+                
 
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':kullanici_id' => $kullanici_id]);
+            $result_sut_dongu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+           
+        } else {
+            // Kullanıcı oturumunda kullanıcı id tanımlı değilse, hata mesajı göster
+            echo "Kullanıcı ID bulunamadı.";
+        }
+
+        if ($kullanici_id !== null) {
+            $sql2 = "SELECT
+                gebelik_dongu.gebelik_dongu_adi AS gdongu_adi,
+                COUNT(inek.inek_id) AS inek_sayisi
+            FROM
+                gebelik_dongu
+            LEFT JOIN
+                inek ON gebelik_dongu.gebelik_dongu_id = inek.gebelik_dongu_id
+            WHERE
+                inek.kullanici_id = :kullanici_id
+            GROUP BY
+                gebelik_dongu.gebelik_dongu_id,
+                gebelik_dongu.gebelik_dongu_adi";
+                
+
+            $stmt = $db->prepare($sql2);
+            $stmt->execute([':kullanici_id' => $kullanici_id]);
+            $result_gebelik_dongu = $stmt->fetchAll(PDO::FETCH_ASSOC);
+           
+        } else {
+            // Kullanıcı oturumunda kullanıcı id tanımlı değilse, hata mesajı göster
+            echo "Kullanıcı ID bulunamadı.";
+        }
+    } catch (PDOException $e) {
+        echo "Hata: " . $e->getMessage();
+    }
+} else {
+    echo "Veritabanı bağlantısı sağlanamadı.";
+}
 
 ?>
 
@@ -200,71 +253,99 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     
 
 
-    <!-- Packages Start -->
-    <div class="container-fluid ">
+
+    <div class="container-fluid">
+        <div class="container pt-5 pb-3">
+        <div class="row">
+        <div class="col-lg-6 col-md-6 mb-4">
+<!-- Packages Start -->
+<?php if (!empty($result_sut_dongu)): ?>
+    <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
+    <div class="container-fluid">
         <div class="container pt-5 pb-3">
             <div class="text-center mb-3 pb-3">
-                <h1 class="text-primary " style="letter-spacing: 5px;">Durum Özeti</h1>
-
+                <h1 class="text-primary" style="letter-spacing: 5px;">Süt Döngüleri</h1>
             </div>
             <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/anasayfaSagımda1.jpeg" alt="">
-                        <div class="p-4">
-                            <a class="h5 text-decoration-none" href="">Sağımda</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="m-0">5</h5>
+                <?php foreach ($result_sut_dongu as $row): ?>
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="package-item bg-white mb-2">
+                            <?php 
+                            // Süt döngüsü için uygun resmi belirleme
+                            $resim = '';
+                            if ($row['sdongu_adi'] == 'Sagimda') {
+                                $resim = 'img/anasayfaSagımda1.jpeg'; // Resim adı düzeltildi
+                            } elseif ($row['sdongu_adi'] == 'Kuruda') {
+                                $resim = 'img/anasayfaKuruda.jpeg';
+                            } 
+                            ?>
+                            <img class="img-fluid" src="<?php echo $resim; ?>"  alt="">
+                            <div class="p-4">
+                                <a class="h5 text-decoration-none" href=""><?php echo $row['sdongu_adi']; ?></a>
+                                <div class="border-top mt-4 pt-4">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/anasayfaKuruda.jpeg" alt="">
-                        <div class="p-4">
-                            <a class="h5 text-decoration-none" href="">Kuruda</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="m-0">5</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/anasayfaGebe.jpeg" alt="">
-                        <div class="p-4">
-                            <a class="h5 text-decoration-none" href="">Gebe</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="m-0">5</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="package-item bg-white mb-2">
-                        <img class="img-fluid" src="img/anasayfaServis.jpeg" alt="">
-                        <div class="p-4">
-                            <a class="h5 text-decoration-none" href="">Servis</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="m-0">5</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
-    <!-- Packages End -->
+<?php else: ?>
+    <p>Süt döngüsü için sonuç bulunamadı.</p>
+<?php endif; ?>
+
+</div>
+<div class="col-lg-6 col-md-6 mb-4">
+
+<?php if (!empty($result_gebelik_dongu)): ?>
+    <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
+    <div class="container-fluid">
+        <div class="container pt-5 pb-3">
+            <div class="text-center mb-3 pb-3">
+                <h1 class="text-primary" style="letter-spacing: 5px;">Gebelik Döngüleri</h1>
+            </div>
+            <div class="row">
+                <?php foreach ($result_gebelik_dongu as $row): ?>
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="package-item bg-white mb-2">
+                            <?php 
+                            // Süt döngüsü için uygun resmi belirleme
+                            $resim = '';
+                            if ($row['gdongu_adi'] == 'Servis') {
+                                $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
+                            } elseif ($row['gdongu_adi'] == 'Gebe') {
+                                $resim = 'img/anasayfaGebe.jpeg';
+                            } 
+                            ?>
+                            <img class="img-fluid" src="<?php echo $resim; ?>"  alt="">
+                            <div class="p-4">
+                                <a class="h5 text-decoration-none" href=""><?php echo $row['gdongu_adi']; ?></a>
+                                <div class="border-top mt-4 pt-4">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php else: ?>
+    <p>Gebelik döngüsü için sonuç bulunamadı.</p>
+<?php endif; ?>
+</div>
+</div>
+<!-- Packages End -->
+
+
+
 
 
 
