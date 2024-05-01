@@ -45,21 +45,30 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 $db = dbBaglantisi();
 
 if ($db instanceof PDO) {
-    $sql = "SELECT TOP 1 QR, ad, dogum_tarihi FROM inek ORDER BY inek_id DESC";
+    // Son QR kodunu al
+    $sql = "SELECT TOP 1 QR FROM inek ORDER BY inek_id DESC";
     $stmt = $db->query($sql);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
+        // Son QR kodunu al ve sayısal kısmını arttır
         $last_qr_code = $row["QR"];
-        // Son QR kodunu 1 arttır
-        $next_qr_code = intval($last_qr_code) + 1;
+        $last_qr_number = intval(substr($last_qr_code, 4)); // QR kodunun sayısal kısmını al
+        $next_qr_number = $last_qr_number + 1;
 
+        // Yeni QR kodunu oluştur
+        $next_qr_code = 'inek' . $next_qr_number;
     } else {
-        echo "Veritabanında inek bulunamadı.";
+        // Tabloda hiç inek yoksa
+        $next_qr_code = 'inek1'; // İlk inek için QR kodu
     }
 } else {
     echo "Veritabanı bağlantısı yapılamadı.";
 }
+
+$ad = "";
+$dogum_tarihi = "";
+$irk = "";
 ?>
 
 
@@ -240,28 +249,32 @@ if ($db instanceof PDO) {
                 <h1 class="text-white m-0">Kayıt </h1>
             </div>
             <div class="card-body rounded-bottom bg-white  ">
-                <form>
+                <form action="gunlukKontrol.php" method="POST">
                     <div class="form-group">
                         <input type="text" class="form-control p-4" name="QR kodu" placeholder="QR kodu"
                             value="<?php echo $next_qr_code; ?>" required="required" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control p-4" name="inek_irki" placeholder="Irk"
+                            value="<?php echo $irk; ?>" required="required" />
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control p-4" name="inek_adi" placeholder="Adı"
                             value="<?php echo $ad; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="date" class="form-control p-4" id="birthDateInput"
+                        <input type="date" class="form-control p-4" id="birthDateInput" name="dogum_tarihi"
                             value="<?php echo $dogum_tarihi; ?>" required="required" />
                     </div>
                     <div>
                         <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
     <!-- kayıt End -->
+
 
 
 

@@ -4,7 +4,16 @@ include_once "config.php";
 
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$yasam_payi = ""; // varsayılan değer
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['hesaplaButton'])) {
+    // hesapla butonuna tıklanmışsa giriş kontrolü yapma
+    if (isset($_POST['kilo'])) {
+        $kilo = $_POST['kilo'];
+        // Yaşam Payını Hesapla: 0,080  x 0,75 x kilo
+        $yasam_payi = number_format(0.080 * 0.75 * $kilo, 2); // Sonucu virgülden sonra iki basamakla göstermek için
+    }
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Giriş yapma işlemi
     $mail = $_POST['mail'];
     $sifre = $_POST['sifre'];
 
@@ -39,6 +48,46 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     // Ana sayfaya yönlendirme
     header("Location: index.php");
     exit();
+}
+$db = dbBaglantisi();
+
+// Eğer QR kodu gönderilmişse
+if (isset($_GET['QR'])) {
+    // GET isteğiyle gelen QR kodunu al
+    $QR = $_GET['QR'];
+
+    // Veritabanından ilgili ineği sorgula
+    $query = $db->prepare("SELECT * FROM inek WHERE QR = :QR");
+    $query->bindParam(':QR', $QR);
+    $query->execute();
+    $inek = $query->fetch(PDO::FETCH_ASSOC);
+
+    // İnek bulunduysa, giriş alanlarına değerleri yerleştir
+    if ($inek) {
+        $inek_id = $inek['inek_id'];
+
+        // İnek kilo ölçüm verisini al
+        $query_kilo = $db->prepare("SELECT TOP 1 kilo FROM kilo_olcum WHERE QR = :QR ORDER BY kolcum_id DESC");
+        $query_kilo->bindParam(':QR', $QR);
+        $query_kilo->execute();
+        $kilo_olcum = $query_kilo->fetch(PDO::FETCH_ASSOC);
+
+        if ($kilo_olcum) {
+            $kilo = $kilo_olcum['kilo'];
+        } else {
+            $kilo = "Kilo bilgisi bulunamadı.";
+        }
+
+        $dogum_tarihi = new DateTime($inek['dogum_tarihi']);
+        // Bugünkü tarih
+        $bugun = new DateTime();
+        // Yaş hesaplaması
+        $yas = $dogum_tarihi->diff($bugun)->y;
+        $irk = $inek['irk'];
+    } else {
+        // İnek bulunamadıysa, hata mesajı göster
+        echo "Belirtilen QR koduna sahip inek bulunamadı.";
+    }
 }
 
 
@@ -92,8 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-<!-- Navbar Start -->
-<div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -180,23 +229,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Modal End -->
 
-    <script>
-
-        // Hata mesajı kontrolü ve modal açma
-        document.addEventListener("DOMContentLoaded", function () {
-            var error = "<?php echo isset($error) ? $error : '' ?>";
-            if (error !== '') {
-                document.getElementById('loginError').innerText = error;
-                openModal('myModal');
-            }
-        });
-
-        // Modal kapatma fonksiyonu ve hata mesajını temizleme
-        function closeAndResetModal(modalId) {
-            document.getElementById(modalId).style.display = "none";
-            document.getElementById('loginError').innerText = '';
-        }
-    </script>
 
 
 
@@ -215,79 +247,68 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
     <!-- Contact Start -->
-    <div class="container-fluid py-5">
+    <div class="container-fluid py-5" style="background-color: #f8f9fa;">
         <div class="container py-5">
-            <div class="text-center mb-3 pb-3">
+            <div class="text-center mb-5">
                 <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;"></h6>
                 <h1>İnek Detay Bilgileri</h1>
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-6">
-                    <div class="contact-form bg-white" style="padding: 30px;">
+                    <div class="contact-form bg-white shadow-lg p-5 rounded">
                         <div id="success"></div>
-                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
-
-                            <div class="control-group col-md-10">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <label>Gün</label>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <input class="form-control p-4" type="text">
-                                    </div>
+                        <form name="hesaplaForm" id="hesaplaForm" method="POST" action="#">
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">QR</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" name="qr"
+                                        value="<?php echo isset($QR) ? $QR : ''; ?>" readonly>
                                 </div>
                             </div>
-                            <br>
-                            <div class="control-group col-md-10">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <label>Döngü</label>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <input class="form-control p-4" type="text">
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Yaşı</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" name="yas"
+                                        value="<?php echo isset($yas) ? $yas : ''; ?>" readonly>
                                 </div>
                             </div>
-
-
-                            <br>
-                            <div class="text-center mb-3 pb-3">
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Irkı</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" name="irki"
+                                        value="<?php echo isset($irk) ? $irk : ''; ?>" readonly>
+                                </div>
+                            </div>
+                            <div class="text-center mb-4">
                                 <h3>Döngü Bilgisi</h3>
                             </div>
-                            <div class="control-group col-md-10">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <label>Kilo</label>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <input class="form-control p-4" type="text">
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Kilo</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" name="kilo"
+                                        value="<?php echo isset($kilo) ? $kilo : ''; ?>" readonly>
                                 </div>
                             </div>
-                            <br>
-                            <div class="control-group col-md-10">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <label>Süt</label>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <input class="form-control p-4" type="text">
-                                    </div>
+                            <div class="form-group row justify-content-center">
+                                <div class="text-center">
+                                    <button class="btn btn-primary btn-lg" type="submit" name="hesaplaButton">Yaşam
+                                        Payını Hesapla</button>
                                 </div>
                             </div>
-                            <div class="text-center" style="padding: 15px;">
-                                <button class="btn btn-primary py-3 px-4" type="submit" id="sendMessageButton">Yaşam
-                                    Payını Hesapla</button>
-                            </div>
-                            <div class="control-group align-items-center">
-                                <input class="form-control" type="text">
+                            <div class="form-group row justify-content-center">
+                                <div class="col-sm-9">
+                                    <input class="form-control" type="text" name="sonuc"
+                                        value="<?php echo $yasam_payi; ?>" readonly>
+                                </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Contact End -->
 
 
@@ -361,6 +382,24 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    <script>
+
+        // Hata mesajı kontrolü ve modal açma
+        document.addEventListener("DOMContentLoaded", function () {
+            var error = "<?php echo isset($error) ? $error : '' ?>";
+            if (error !== '') {
+                document.getElementById('loginError').innerText = error;
+                openModal('myModal');
+            }
+        });
+
+        // Modal kapatma fonksiyonu ve hata mesajını temizleme
+        function closeAndResetModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            document.getElementById('loginError').innerText = '';
+        }
+    </script>
 </body>
 
 </html>
