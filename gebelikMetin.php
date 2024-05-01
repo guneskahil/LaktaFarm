@@ -92,8 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-  <!-- Navbar Start -->
-  <div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -105,8 +105,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
-
+                        <?php if (isset($_SESSION['ad'])): ?>
+                            <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
+                        <?php else: ?>
+                            <a href="index.php" class="nav-item nav-link active">Ana Sayfa</a>
+                        <?php endif; ?>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
