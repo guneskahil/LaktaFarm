@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
             $_SESSION['kullanici_id'] = $kullanici['kullanici_id']; // Kullanıcının id'sini oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
+            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
             // Kullanıcı bulunamadı, hata mesajı ayarla
@@ -139,8 +139,8 @@ if ($db instanceof PDO) {
     </div>
     <!-- Topbar End -->
 
- <!-- Navbar Start -->
- <div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">

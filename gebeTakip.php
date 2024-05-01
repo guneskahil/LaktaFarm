@@ -20,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
+            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
             // Kullanıcı bulunamadı, hata mesajı ayarla
@@ -41,7 +42,58 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     exit();
 }
 
+$db = dbBaglantisi();
+if ($db instanceof PDO) {
+    try {
+        // SQL sorgusu
+        $sql = "SELECT 
+        i.QR,
+        i.ad,
+        gd.gebelik_dongu_adi AS döngü_adi,
+        CASE 
+            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodunda'
+            ELSE 'Sürüden Çıkarılmalı'
+        END AS durum,
+        CASE 
+            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
+            ELSE NULL
+        END AS gun
+    FROM 
+        inek i
+    LEFT JOIN 
+        dollenme d ON i.inek_id = d.inek_id
+    LEFT JOIN 
+        gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
+    WHERE
+        i.kullanici_id = :kullanici_id AND
+        d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi)
+    
+    ";
 
+        // SQL sorgusunu hazırlama
+        $stmt = $db->prepare($sql);
+
+        // Oturumda kullanıcı id'sini al
+        $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
+
+        // SQL sorgusunu çalıştırma
+        $stmt->execute([':kullanici_id' => $kullanici_id]);
+
+        // Sonuçları alma
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
+        if (!$result) {
+            echo "Sonuç bulunamadı.";
+        }
+    } catch (PDOException $e) {
+        // Hata durumunda hata mesajını ekrana yazdırma
+        echo "Hata: " . $e->getMessage();
+    }
+} else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+}
 
 
 
@@ -49,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8">
@@ -91,8 +143,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
         </div>
     </div>
     <!-- Topbar End -->
-<!-- Navbar Start -->
-<div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -214,45 +266,44 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
     <!-- Booking Start -->
-
-    <!-- Booking End -->
-
-
-    <!-- Contact Start -->
     <div class="container-fluid py-5">
         <div class="container py-5">
             <div class="justify-content-center">
-                <div class="text-center mb-3 pb-3">
-                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Gebelik Periyodu Kontrolü</h6>
-                </div>
-                <div class="row justify-content-center">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Adı</th>
-                                <th>Döngü</th>
-                                <th>Kg</th>
-                                <th>Süt</th>
-                                <th>Detay</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>İnek Adı 1</td>
-                                <td>Döngü Bilgisi 1</td>
-                                <td>Kg Bilgisi 1</td>
-                                <td>Süt Bilgisi 1</td>
-                                <td><a href="inekKayit.php" class="btn btn-primary">İnek Ekle</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase text-primary mb-3 row justify-content-center"
+                            style="letter-spacing: 5px;">Gebe
+                            Takip Tablosu</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>QR</th>
+                                        <th>Adı</th>
+                                        <th>Döngü Adı</th>
+                                        <th>Döngünün Kaçıncı Günü</th>
+                                        <th>Detay</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($result as $row): ?>
+                                        <tr>
+                                            <td><?php echo $row['QR']; ?></td>
+                                            <td><?php echo $row['ad']; ?></td>
+                                            <td><?php echo $row['durum']; ?></td>
+                                            <td><?php echo isset($row['gun']) ? $row['gun'] : '-'; ?></td>
+                                            <td><a href="inekKayit.php" class="btn btn-primary">İnek Ekle</a></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Contact End -->
-
+    <!-- Booking End -->
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">

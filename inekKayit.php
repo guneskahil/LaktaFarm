@@ -20,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
             $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
+            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
             // Kullanıcı bulunamadı, hata mesajı ayarla
@@ -41,11 +42,26 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     exit();
 }
 
+$db = dbBaglantisi();
 
+if ($db instanceof PDO) {
+    $sql = "SELECT TOP 1 QR, ad, dogum_tarihi FROM inek ORDER BY inek_id DESC";
+    $stmt = $db->query($sql);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    if ($row) {
+        $last_qr_code = $row["QR"];
+        // Son QR kodunu 1 arttır
+        $next_qr_code = intval($last_qr_code) + 1;
 
-
+    } else {
+        echo "Veritabanında inek bulunamadı.";
+    }
+} else {
+    echo "Veritabanı bağlantısı yapılamadı.";
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -92,8 +108,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-  <!-- Navbar Start -->
-  <div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -217,8 +233,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
     <!-- kayıt -->
-
-
     <div class="container py-5"
         style="padding-top: 40px, margin-top: 20px; width: 50%;margin-left: auto; margin-right: auto;text-align: center !important;">
         <div class="card border-0 col-12" style="text-align: center !important;">
@@ -229,14 +243,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <form>
                     <div class="form-group">
                         <input type="text" class="form-control p-4" name="QR kodu" placeholder="QR kodu"
-                            required="required" />
+                            value="<?php echo $next_qr_code; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="email" class="form-control p-4" name="inek_adi" placeholder="Adı"
-                            required="required" />
+                        <input type="text" class="form-control p-4" name="inek_adi" placeholder="Adı"
+                            value="<?php echo $ad; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="date" class="form-control p-4" id="birthDateInput" required="required" />
+                        <input type="date" class="form-control p-4" id="birthDateInput"
+                            value="<?php echo $dogum_tarihi; ?>" required="required" />
                     </div>
                     <div>
                         <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
@@ -245,10 +260,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
             </div>
         </div>
-
     </div>
-
-
     <!-- kayıt End -->
 
 

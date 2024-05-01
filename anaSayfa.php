@@ -56,13 +56,13 @@ if ($db instanceof PDO) {
             GROUP BY
                 sut_dongu.sut_dongu_id,
                 sut_dongu.sut_dongu_adi";
-                
+
 
             $stmt = $db->prepare($sql);
             $stmt->execute([':kullanici_id' => $kullanici_id]);
             $result_sut_dongu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-           
+
         } else {
             // Kullanıcı oturumunda kullanıcı id tanımlı değilse, hata mesajı göster
             echo "Kullanıcı ID bulunamadı.";
@@ -81,12 +81,12 @@ if ($db instanceof PDO) {
             GROUP BY
                 gebelik_dongu.gebelik_dongu_id,
                 gebelik_dongu.gebelik_dongu_adi";
-                
+
 
             $stmt = $db->prepare($sql2);
             $stmt->execute([':kullanici_id' => $kullanici_id]);
             $result_gebelik_dongu = $stmt->fetchAll(PDO::FETCH_ASSOC);
-           
+
         } else {
             // Kullanıcı oturumunda kullanıcı id tanımlı değilse, hata mesajı göster
             echo "Kullanıcı ID bulunamadı.";
@@ -250,100 +250,103 @@ if ($db instanceof PDO) {
             document.getElementById('loginError').innerText = '';
         }
     </script>
-    
+
 
 
 
     <div class="container-fluid">
         <div class="container pt-5 pb-3">
-        <div class="row">
-        <div class="col-lg-6 col-md-6 mb-4">
-<!-- Packages Start -->
-<?php if (!empty($result_sut_dongu)): ?>
-    <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
-    <div class="container-fluid">
-        <div class="container pt-5 pb-3">
-            <div class="text-center mb-3 pb-3">
-                <h1 class="text-primary" style="letter-spacing: 5px;">Süt Döngüleri</h1>
-            </div>
             <div class="row">
-                <?php foreach ($result_sut_dongu as $row): ?>
-                    <div class="col-lg-6 col-md-6 mb-4">
-                        <div class="package-item bg-white mb-2">
-                            <?php 
-                            // Süt döngüsü için uygun resmi belirleme
-                            $resim = '';
-                            if ($row['sdongu_adi'] == 'Sagimda') {
-                                $resim = 'img/anasayfaSagımda1.jpeg'; // Resim adı düzeltildi
-                            } elseif ($row['sdongu_adi'] == 'Kuruda') {
-                                $resim = 'img/anasayfaKuruda.jpeg';
-                            } 
-                            ?>
-                            <img class="img-fluid" src="<?php echo $resim; ?>"  alt="">
-                            <div class="p-4">
-                                <a class="h5 text-decoration-none" href=""><?php echo $row['sdongu_adi']; ?></a>
-                                <div class="border-top mt-4 pt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
-                                    </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <!-- Packages Start -->
+                    <?php if (!empty($result_sut_dongu)): ?>
+                        <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
+                        <div class="container-fluid">
+                            <div class="container pt-5 pb-3">
+                                <div class="text-center mb-3 pb-3">
+                                    <h1 class="text-primary" style="letter-spacing: 5px;">Süt Döngüleri</h1>
+                                </div>
+                                <div class="row">
+                                    <?php foreach ($result_sut_dongu as $row): ?>
+                                        <div class="col-lg-6 col-md-6 mb-4">
+                                            <div class="package-item bg-white mb-2">
+                                                <?php
+                                                // Süt döngüsü için uygun resmi belirleme
+                                                $resim = '';
+                                                if ($row['sdongu_adi'] == 'Sagimda') {
+                                                    $resim = 'img/anasayfaSagımda1.jpeg'; // Resim adı düzeltildi
+                                                } elseif ($row['sdongu_adi'] == 'Kuruda') {
+                                                    $resim = 'img/anasayfaKuruda.jpeg';
+                                                }
+                                                ?>
+                                                <img class="img-fluid" src="<?php echo $resim; ?>" alt="">
+                                                <div class="p-4">
+                                                    <a class="h5 text-decoration-none"
+                                                        href=""><?php echo $row['sdongu_adi']; ?></a>
+                                                    <div class="border-top mt-4 pt-4">
+                                                        <div class="d-flex justify-content-between">
+                                                            <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </div>
-<?php else: ?>
-    <p>Süt döngüsü için sonuç bulunamadı.</p>
-<?php endif; ?>
+                    <?php else: ?>
+                        <p>Süt döngüsü için sonuç bulunamadı.</p>
+                    <?php endif; ?>
 
-</div>
-<div class="col-lg-6 col-md-6 mb-4">
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
 
-<?php if (!empty($result_gebelik_dongu)): ?>
-    <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
-    <div class="container-fluid">
-        <div class="container pt-5 pb-3">
-            <div class="text-center mb-3 pb-3">
-                <h1 class="text-primary" style="letter-spacing: 5px;">Gebelik Döngüleri</h1>
-            </div>
-            <div class="row">
-                <?php foreach ($result_gebelik_dongu as $row): ?>
-                    <div class="col-lg-6 col-md-6 mb-4">
-                        <div class="package-item bg-white mb-2">
-                            <?php 
-                            // Süt döngüsü için uygun resmi belirleme
-                            $resim = '';
-                            if ($row['gdongu_adi'] == 'Servis') {
-                                $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
-                            } elseif ($row['gdongu_adi'] == 'Gebe') {
-                                $resim = 'img/anasayfaGebe.jpeg';
-                            } 
-                            ?>
-                            <img class="img-fluid" src="<?php echo $resim; ?>"  alt="">
-                            <div class="p-4">
-                                <a class="h5 text-decoration-none" href=""><?php echo $row['gdongu_adi']; ?></a>
-                                <div class="border-top mt-4 pt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
-                                    </div>
+                    <?php if (!empty($result_gebelik_dongu)): ?>
+                        <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
+                        <div class="container-fluid">
+                            <div class="container pt-5 pb-3">
+                                <div class="text-center mb-3 pb-3">
+                                    <h1 class="text-primary" style="letter-spacing: 5px;">Gebelik Döngüleri</h1>
+                                </div>
+                                <div class="row">
+                                    <?php foreach ($result_gebelik_dongu as $row): ?>
+                                        <div class="col-lg-6 col-md-6 mb-4">
+                                            <div class="package-item bg-white mb-2">
+                                                <?php
+                                                // Süt döngüsü için uygun resmi belirleme
+                                                $resim = '';
+                                                if ($row['gdongu_adi'] == 'Servis') {
+                                                    $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
+                                                } else {
+                                                    $resim = 'img/anasayfaGebe.jpeg';
+                                                }
+                                                ?>
+                                                <img class="img-fluid" src="<?php echo $resim; ?>" alt="">
+                                                <div class="p-4">
+                                                    <a class="h5 text-decoration-none"
+                                                        href=""><?php echo $row['gdongu_adi']; ?></a>
+                                                    <div class="border-top mt-4 pt-4">
+                                                        <div class="d-flex justify-content-between">
+                                                            <h5 class="m-0"><?php echo $row['inek_sayisi']; ?></h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                   
-                <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>Gebelik döngüsü için sonuç bulunamadı.</p>
+                    <?php endif; ?>
+                </div>
             </div>
+            <!-- Packages End -->
         </div>
     </div>
-<?php else: ?>
-    <p>Gebelik döngüsü için sonuç bulunamadı.</p>
-<?php endif; ?>
-</div>
-</div>
-<!-- Packages End -->
-
 
 
 
@@ -389,7 +392,8 @@ if ($db instanceof PDO) {
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
                 <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">İletişim</h5>
-                <p><i class="fa fa-map-marker-alt mr-2"></i>Kabaoğlu, Kocaeli Üniversitesi Umuttepe Kampüsü, A Kapısı,
+                <p><i class="fa fa-map-marker-alt mr-2"></i>Kabaoğlu, Kocaeli Üniversitesi Umuttepe Kampüsü, A
+                    Kapısı,
                     41001 İzmit/Kocaeli</p>
                 <p><i class="fa fa-phone-alt mr-2"></i>+012 345 67890</p>
                 <p><i class="fa fa-envelope mr-2"></i>LaktaFarm@example.com</p>
