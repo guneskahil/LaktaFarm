@@ -341,7 +341,7 @@ LEFT JOIN
 
                                             <td><?php echo $row['kilo']; ?></td>
                                             <td><?php echo $row['sut_miktar']; ?></td>
-                                            <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
+                                            <td><a href="inekdetay.php" class="btn btn-primary">Detay</a></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

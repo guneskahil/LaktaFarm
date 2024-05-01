@@ -197,6 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             document.getElementById('loginError').innerText = '';
         }
     </script>
+    
 
 
     <!-- Packages Start -->
