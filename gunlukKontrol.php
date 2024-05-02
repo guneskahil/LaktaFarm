@@ -96,7 +96,7 @@ LEFT JOIN
 
         // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
         if (!$result) {
-            echo "Sonuç bulunamadı.";
+
         }
     } catch (PDOException $e) {
         // Hata durumunda hata mesajını ekrana yazdırma
