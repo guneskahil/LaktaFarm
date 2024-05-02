@@ -1,55 +1,92 @@
 <?php
 // config.php dosyasını dahil et
 include_once "config.php";
-
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mail = $_POST['mail'];
-    $sifre = $_POST['sifre'];
+    if (isset($_POST['mail']) && isset($_POST['sifre'])) {
+        $mail = $_POST['mail'];
+        $sifre = $_POST['sifre'];
 
-    $db = dbBaglantisi();
+        $db = dbBaglantisi();
 
-    if ($db instanceof PDO) {
-        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
-        $query->bindParam(':mail', $mail);
-        $query->bindParam(':sifre', $sifre);
-        $query->execute();
-        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
+        if ($db instanceof PDO) {
+            $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
+            $query->bindParam(':mail', $mail);
+            $query->bindParam(':sifre', $sifre);
+            $query->execute();
+            $kullanici = $query->fetch(PDO::FETCH_ASSOC);
 
-        if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+            if ($kullanici) {
+                $_SESSION['ad'] = $kullanici['ad'];
+                header("Location: index.php");
+                exit();
+            } else {
+                $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
+            }
         } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
-            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
+            $error = "Veritabanı bağlantısı yapılamadı.";
         }
-    } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
-        $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
 
+// Çıkış işlemi
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
-    // Çıkış işlemi
     session_unset();
     session_destroy();
-    // Ana sayfaya yönlendirme
     header("Location: index.php");
     exit();
 }
 
+$error = '';
 
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
+    // Formdan gelen verileri al
+    $dollenme_sayisi = $_POST['dollenme_sayisi'];
+    $dollenme_durumu = $_POST['dollenme_durumu'];
+    $dollenme_tarihi = $_POST['dollenme_tarihi'];
 
+    // inek_id'yi $_GET ile al
+    $inek_id = isset($_GET['inek_id']) ? $_GET['inek_id'] : '';
 
+    try {
+        $db = dbBaglantisi();
+
+        if ($db instanceof PDO) {
+            // Güncelleme sorgusunu hazırla
+            $sql = "UPDATE dollenme 
+                    SET dollenme_sayisi = :dollenme_sayisi, 
+                        dollenme_durumu = :dollenme_durumu, 
+                        dollenme_tarihi = :dollenme_tarihi 
+                    WHERE inek_id = :inek_id";
+
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':inek_id', $inek_id);
+            $stmt->bindParam(':dollenme_sayisi', $dollenme_sayisi);
+            $stmt->bindParam(':dollenme_durumu', $dollenme_durumu);
+            $stmt->bindParam(':dollenme_tarihi', $dollenme_tarihi);
+
+            // Güncelleme sorgusunu çalıştır
+            if ($stmt->execute()) {
+                header("Location: dollemeTakip.php");
+                exit();
+            } else {
+                // Hata durumunda hata mesajı oluştur
+                $error = "Bir hata oluştu. Lütfen tekrar deneyin.";
+            }
+        } else {
+            $error = "Veritabanı bağlantısı yapılamadı.";
+        }
+    } catch (PDOException $e) {
+        $error = "Veritabanı hatası: " . $e->getMessage();
+    }
+}
 
 ?>
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8">
@@ -92,8 +129,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Topbar End -->
 
-<!-- Navbar Start -->
-<div class="container-fluid position-relative nav-bar p-0">
+    <!-- Navbar Start -->
+    <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
                 <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
@@ -212,7 +249,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Header End -->
 
-
     <!-- Contact Start -->
     <div class="container-fluid">
         <div class="container py-5">
@@ -224,15 +260,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <div class="col-lg-6">
                     <div class="contact-form bg-white" style="padding: 30px;">
                         <div id="success"></div>
-                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
-
+                        <form name="guncelle" id="guncelle"
+                            action="dollemeDetay.php?inek_id=<?php echo isset($_GET['inek_id']) ? $_GET['inek_id'] : ''; ?>"
+                            method="POST" novalidate="novalidate">
+                            <input type="hidden" name="inek_id"
+                                value="<?php echo isset($_GET['QR']) ? $_GET['QR'] : ''; ?>">
                             <div class="control-group col-md-10">
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <label>Döllenme Tarihi</label>
                                     </div>
                                     <div class="col-md-8">
-                                        <input class="form-control p-4" type="text">
+                                        <input class="form-control p-4" type="date" name="dollenme_tarihi">
                                     </div>
                                 </div>
                             </div>
@@ -244,7 +283,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                                     </div>
                                     <div class="col-md-8">
                                         <div class="input-group">
-                                            <input class="form-control p-4" type="text">
+                                            <input class="form-control p-4" type="text" name="dollenme_sayisi">
                                         </div>
                                     </div>
                                 </div>
@@ -257,27 +296,21 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                             </div>
                             <div class="control-group ">
                                 <div class="row justify-content-center">
-
                                     <div class="form-check mr-2">
-                                        <input class="form-check-input" type="radio" name="döllenmeSayısı"
-                                            id="döllenme1" value="1">
-                                        <label class="form-check-label" for="döllenme1">
-                                            Evet
-                                        </label>
+                                        <input class="form-check-input" type="radio" name="dollenme_durumu"
+                                            id="döllenme1" value="Evet">
+                                        <label class="form-check-label" for="döllenme1">Evet</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="döllenmeSayısı"
-                                            id="döllenme2" value="2">
-                                        <label class="form-check-label" for="döllenme2">
-                                            Hayır
-                                        </label>
+                                        <input class="form-check-input" type="radio" name="dollenme_durumu"
+                                            id="döllenme2" value="Hayır">
+                                        <label class="form-check-label" for="döllenme2">Hayır</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="input-group" style="padding-top: 10px;">
-                                <input type="submit" value="Bilgileri Kaydet">
+                                <input type="submit" name="bilgiGuncelle" value="Bilgileri Kaydet">
                             </div>
-
                         </form>
                     </div>
                 </div>

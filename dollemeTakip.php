@@ -299,7 +299,8 @@ if ($db instanceof PDO) {
                                                     -
                                                 <?php endif; ?>
                                             </td>
-                                            <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
+                                            <td><a href="dollemedetay.php?inek_id=<?php echo $row['inek_id']; ?>"
+                                                    class="btn btn-primary">Detay</a></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

@@ -37,9 +37,9 @@ $kullanici_id = $_SESSION['kullanici_id'];
 // Kaydetme işlemi
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
     // Formdan gelen verileri al
-    $QR = $_POST['QR']; // QR kodu alanı adını güncelledim
-    $ad = $_POST['ad']; // İnek adı alanı adını güncelledim
-    $irk = $_POST['irk']; // İnek ırkı alanı adını güncelledim
+    $QR = $_POST['QR'];
+    $ad = $_POST['ad'];
+    $irk = $_POST['irk'];
     $dogum_tarihi = $_POST['dogum_tarihi'];
 
     // Veritabanı bağlantısını yap
