@@ -25,14 +25,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
             $_SESSION['mail'] = $kullanici['mail'];
             $_SESSION['tel_no'] = $kullanici['tel_no']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
+
+            // Kullanıcının inek tablosunda var olup olmadığını kontrol et
+            $queryInek = $db->prepare("SELECT * FROM inek WHERE kullanici_id = :kullanici_id");
+            $queryInek->bindParam(':kullanici_id', $kullanici['kullanici_id']);
+            $queryInek->execute();
+            $inek = $queryInek->fetch(PDO::FETCH_ASSOC);
+
+            if (!$inek) {
+                // Kullanıcının inek kaydı yoksa, inek kayıt sayfasına yönlendir
+                header("Location: inekKayit.php");
+                exit();
+            }
+
+            // Kullanıcının inek kaydı varsa, ana sayfaya yönlendir
+            header("Location: anaSayfa.php");
             exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         } else {
             // Kullanıcı bulunamadı, hata mesajı ayarla
             $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
         }
     } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
+        // Veritabanı bağlanılamadı, hata mesajı ayarla
         $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
@@ -45,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     header("Location: index.php");
     exit();
 }
-?>
+?> 
 
 
 <!DOCTYPE html>
@@ -171,7 +185,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </div>
             </form>
             <p style="text-align: center; margin-top: 10px;">
-                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
+                Hesabınız yok mu? <a href="kayit.php">Kayıt olun</a>.
             </p>
             <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
         </div>
@@ -223,7 +237,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
         </div>
     </div>
 
-    <!-- Destination Start -->
+    <!-- karsılama Start -->
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
             <div class="text-center mb-3 pb-3">
@@ -270,7 +284,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             </div>
         </div>
     </div>
-    <!-- Destination Start -->
+    <!-- karsılama Start -->
 
 
 

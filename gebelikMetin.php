@@ -216,15 +216,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Header End -->
 
-
-    <!-- About Start -->
-    <div class="container-fluid ">
+ <!-- gebeMetin Start -->
+ <div class="container-fluid py-5">
         <div class="container pt-5">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-6" style="min-height: 500px;">
                     <div class="position-relative h-100">
-                        <img class="position-absolute" src="img/seffafInek.webp"
-                            style="object-fit: cover; width: 500px; bottom: 180px; right: 100px;">
+                        <img class="position-absolute w-100 h-100" src="img/anneYavru.jpg" style="object-fit: cover;">
                     </div>
                 </div>
                 <div class="col-lg-6 pt-5 pb-lg-5">
@@ -249,8 +247,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             </div>
         </div>
     </div>
+    <!-- gebeMetin End -->
 
-    <!-- About End -->
 
 
     <!-- Footer Start -->

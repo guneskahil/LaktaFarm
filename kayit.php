@@ -4,7 +4,8 @@ include_once "config.php";
 
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Giriş işlemi
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mail']) && isset($_POST['sifre'])) {
     $mail = $_POST['mail'];
     $sifre = $_POST['sifre'];
 
@@ -16,32 +17,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query->bindParam(':sifre', $sifre);
         $query->execute();
         $kullanici = $query->fetch(PDO::FETCH_ASSOC);
- // Kullanıcının inek tablosunda var olup olmadığını kontrol et
- $queryInek = $db->prepare("SELECT * FROM inek WHERE kullanici_id = :kullanici_id");
- $queryInek->bindParam(':kullanici_id', $kullanici['kullanici_id']);
- $queryInek->execute();
- $inek = $queryInek->fetch(PDO::FETCH_ASSOC);
 
- if (!$inek) {
-     // Kullanıcının inek kaydı yoksa, inek kayıt sayfasına yönlendir
-     header("Location: inekKayit.php");
-     exit();
- }
-
- // Kullanıcının inek kaydı varsa, ana sayfaya yönlendir
- header("Location: anaSayfa.php");
- exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
         if ($kullanici) {
             // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+            $_SESSION['ad'] = $kullanici['ad'];
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
+            header("Location: anaSayfa.php");
+            exit();
         } else {
             // Kullanıcı bulunamadı, hata mesajı ayarla
             $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
         }
     } else {
         // Veritabanına bağlanılamadı, hata mesajı ayarla
+        $error = "Veritabanı bağlantısı yapılamadı.";
+    }
+}
+
+// Kaydetme işlemi
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
+    // Formdan gelen verileri al
+    $ad = $_POST['ad']; 
+    $soyad = $_POST['soyad']; 
+    $mail = $_POST['mail']; 
+    $sifre = $_POST['sifre'];
+    $kimlik_no = $_POST['kimlik_no']; 
+    $tel_no = $_POST['tel_no'];
+
+    // Veritabanı bağlantısını yap
+    $db = dbBaglantisi();
+
+    if ($db instanceof PDO) {
+        // SQL sorgusunu hazırla
+        $query = $db->prepare("INSERT INTO kullanici (ad, soyad, mail, sifre, kimlik_no, tel_no) VALUES (:ad, :soyad, :mail, :sifre, :kimlik_no, :tel_no)");
+
+        // Parametreleri bağla
+        $query->bindParam(':ad', $ad);
+        $query->bindParam(':soyad', $soyad);
+        $query->bindParam(':mail', $mail);
+        $query->bindParam(':sifre', $sifre);
+        $query->bindParam(':kimlik_no', $kimlik_no);
+        $query->bindParam(':tel_no', $tel_no);
+
+        // Sorguyu çalıştır
+        if ($query->execute()) {
+            // Başarılı bir şekilde eklendiğinde kullanıcıyı başka bir sayfaya yönlendir
+            header("Location: index.php");
+            exit();
+        } else {
+            // Ekleme işlemi başarısız olduysa hata mesajı oluştur
+            $error = "Kullanıcı kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.";
+        }
+    } else {
+        // Veritabanına bağlanılamadıysa hata mesajı oluştur
         $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
@@ -54,16 +82,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     header("Location: index.php");
     exit();
 }
-
-
-
-
-
 ?>
 
 
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8">
@@ -119,11 +144,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                     <div class="navbar-nav ml-auto py-0">
-                        <?php if (isset($_SESSION['ad'])): ?>
-                            <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
-                        <?php else: ?>
-                            <a href="index.php" class="nav-item nav-link active">Ana Sayfa</a>
-                        <?php endif; ?>
+                        <a href="anaSayfa.php" class="nav-item nav-link active">Ana Sayfa</a>
+
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Döngüler</a>
                             <div class="dropdown-menu border-0 rounded-0 m-0">
@@ -223,7 +245,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
 
                 <div class="d-inline-flex text-white" style="font-size: 30px;">
-                    <p class="m-0 ">Sağım Periyodu Nedir?</p>
+                    <p class="m-0 ">İnek Kayıt</p>
                 </div>
             </div>
         </div>
@@ -231,52 +253,44 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <!-- Header End -->
 
 
-    <!-- About Start -->
-    <div class="container-fluid ">
-        <div class="container pt-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="position-relative h-100">
-                        <img class="position-absolute" src="img/sagimMetin.jpg"
-                            style="object-fit: cover; width: 500px; bottom: 180px; right: 100px;">
-                    </div>
+
+<!-- kayıt -->
+<div class="container py-5" style="width: 50%; margin: 20px auto; text-align: center;">
+    <div class="card border-0 col-12">
+        <div class="card-header bg-primary text-center">
+            <h1 class="text-white m-0">Kayıt</h1>
+        </div>
+        <div class="card-body rounded-bottom bg-white">
+            <form action="kayit.php" method="POST">
+                <div class="form-group">
+                    <input type="text" class="form-control p-4" name="ad" placeholder="Adı" required>
                 </div>
-                
-            </div>
+                <div class="form-group">
+                    <input type="text" class="form-control p-4" name="soyad" placeholder="Soyadı" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control p-4" id="kimlik_no" name="kimlik_no" placeholder="Kimlik Numarası" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control p-4" name="tel_no" placeholder="Telefon Numarası" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control p-4" id="mail" name="mail" placeholder="E-posta Adresi" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control p-4" id="sifre" name="sifre" placeholder="Şifre" required>
+                </div>
+                <div>
+                    <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+<!-- kayıt End -->
 
-    <!-- About End -->
-<!-- sagimMetin Start -->
-<div class="container-fluid py-5">
-        <div class="container pt-5">
-            <div class="row">
-                <div class="col-lg-6" style="min-height: 500px;">
-                    <div class="position-relative h-100">
-                        <img class="position-absolute w-100 h-100" src="img/sagimMetin.jpg" style="object-fit: cover;">
-                    </div>
-                </div>
-                <div class="col-lg-6 pt-5 pb-lg-5">
-                    <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
-                        <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Sağım Periyodu</h6>
-                        <p>Sağım periyodu, ineklerin süt üretim döngüsünü tanımlar. Tipik olarak, sağım periyodu her
-                            inek için birbirinden farklı olabilir ancak genel olarak ortalama 305 gün sürer. Bu süre,
-                            bir inek bir sonraki döngüye geçmeden önce bir dölleme ve gebelik sürecini içerir.<br> <br>
 
-                            Sağımda inekler, genellikle her gün sağım yapılarak süt verimlerinin maksimum seviyede
-                            tutulması sağlanır. Bu nedenle, sağım periyodu boyunca günlük olarak ineklerin süt verimleri
-                            kontrol edilir ve bu verilere göre beslenme ve sağlık programları düzenlenir.<br><br>
 
-                            Özetle, sağım periyodu inekler için hayati öneme sahip bir süreçtir ve sağlıklı bir süt
-                            üretimi için dikkatle yönetilmelidir. Bu süreç, her bir inek için farklılık gösterebilir
-                            ancak genel olarak 305 gün olarak kabul edilir ve bu süre boyunca düzenli sağım, beslenme ve
-                            sağlık kontrolleri yapılmalıdır.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- sagimMetin End -->
 
 
     <!-- Footer Start -->

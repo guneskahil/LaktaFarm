@@ -271,7 +271,6 @@ if ($db instanceof PDO) {
                                         <th>Adı</th>
                                         <th>Döngü Adı</th>
                                         <th>Döngünün Kaçıncı Günü</th>
-                                        <th>Detay</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -293,7 +292,6 @@ if ($db instanceof PDO) {
                                                     -
                                                 <?php endif; ?>
                                             </td>
-                                            <td><a href="dollemeDetay.php" class="btn btn-primary">Detay</a></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
