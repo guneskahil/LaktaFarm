@@ -3,10 +3,10 @@
 
 function dbBaglantisi()
 {
-    $sunucu = "bulutsqldeneme.database.windows.net";
+    $sunucu = "bulutsqlserver.database.windows.net";
     $veritabani = "LaktaFarmDB";
     $kullanici = "sqladmin";
-    $sifre = "admin.123";
+    $sifre = "bulutadmin.123";
 
     try {
         $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);

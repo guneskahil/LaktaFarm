@@ -275,7 +275,7 @@ if ($db instanceof PDO) {
                                                 $resim = '';
                                                 if ($row['sdongu_adi'] == 'Sagimda') {
                                                     $resim = 'img/anasayfaSagımda1.jpeg'; // Resim adı düzeltildi
-                                                } elseif ($row['sdongu_adi'] == 'Kuruda') {
+                                                } else {
                                                     $resim = 'img/anasayfaKuruda.jpeg';
                                                 }
                                                 ?>
