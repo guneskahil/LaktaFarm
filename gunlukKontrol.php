@@ -106,6 +106,7 @@ LEFT JOIN
     // Veritabanı bağlantısı sağlanamadı hatası
     echo "Veritabanı bağlantısı sağlanamadı.";
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -299,6 +300,12 @@ LEFT JOIN
                                 </thead>
                                 <tbody>
                                     <?php foreach ($result as $row): ?>
+                                        <?php
+                                        // İneğin yaşını hesapla
+                                        $dogum_tarihi = new DateTime($row['dogum_tarihi']);
+                                        $bugun = new DateTime();
+                                        $yas = $dogum_tarihi->diff($bugun)->y;
+                                        ?>
                                         <tr>
                                             <td>
                                                 <?php if (isset($row['QR'])): ?>
@@ -308,7 +315,13 @@ LEFT JOIN
                                                 <?php endif; ?>
                                             </td>
                                             <td><?php echo $row['ad']; ?></td>
-                                            <td><?php echo $row['gebe_durum']; ?></td>
+                                            <td>
+                                                <?php if ($yas < 2): ?>
+                                                    Yenidoğan
+                                                <?php else: ?>
+                                                    <?php echo $row['gebe_durum']; ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <?php if (isset($row['gun'])): ?>
                                                     <?php echo $row['gun']; ?>

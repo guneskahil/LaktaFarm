@@ -66,8 +66,11 @@ if ($db instanceof PDO) {
         gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
     WHERE
         i.kullanici_id = :kullanici_id AND
-        d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi)
-    
+        (
+            d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi)
+            OR
+            i.inek_id IN (SELECT inek_id FROM dollenme WHERE dollenme_durumu = 'hayır')
+        )
     ";
 
         // SQL sorgusunu hazırlama
@@ -282,7 +285,7 @@ if ($db instanceof PDO) {
                                         <th>Adı</th>
                                         <th>Döngü Adı</th>
                                         <th>Döngünün Kaçıncı Günü</th>
-                                        <th>Detay</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -290,9 +293,26 @@ if ($db instanceof PDO) {
                                         <tr>
                                             <td><?php echo $row['QR']; ?></td>
                                             <td><?php echo $row['ad']; ?></td>
-                                            <td><?php echo $row['durum']; ?></td>
+                                            <td>
+                                                <?php
+                                                if ($row['durum'] !== 'Gebelik Periyodunda') {
+                                                    echo "Doğum Yaptı - Servis Periyodunda ";
+                                                } else {
+                                                    echo $row['durum'];
+                                                }
+                                                ?>
+
+                                            </td>
                                             <td><?php echo isset($row['gun']) ? $row['gun'] : '-'; ?></td>
-                                            <td><a href="inekKayit.php" class="btn btn-primary">İnek Ekle</a></td>
+                                            <td>
+                                                <?php if ($row['durum'] !== 'Gebelik Periyodunda'): ?>
+                                                    <a href="<?php echo $row['durum'] !== 'Gebelik Periyodunda' ? 'inekKayit.php' : 'İnek Ekle'; ?>"
+                                                        class="btn btn-primary">
+                                                        <?php echo $row['durum'] !== 'Gebelik Periyodunda' ? 'Yenidoğan Ekle' : ''; ?>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

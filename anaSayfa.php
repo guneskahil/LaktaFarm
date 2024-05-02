@@ -316,7 +316,7 @@ if ($db instanceof PDO) {
                                                 <?php
                                                 // Süt döngüsü için uygun resmi belirleme
                                                 $resim = '';
-                                                if ($row['gdongu_adi'] == 'Servis') {
+                                                if ($row['gdongu_adi'] == 'Serviste') {
                                                     $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
                                                 } else {
                                                     $resim = 'img/anasayfaGebe.jpeg';

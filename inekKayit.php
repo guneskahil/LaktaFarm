@@ -4,7 +4,8 @@ include_once "config.php";
 
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Giriş işlemi
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mail']) && isset($_POST['sifre'])) {
     $mail = $_POST['mail'];
     $sifre = $_POST['sifre'];
 
@@ -32,6 +33,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Veritabanı bağlantısı yapılamadı.";
     }
 }
+$kullanici_id = $_SESSION['kullanici_id'];
+// Kaydetme işlemi
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
+    // Formdan gelen verileri al
+    $QR = $_POST['QR']; // QR kodu alanı adını güncelledim
+    $ad = $_POST['ad']; // İnek adı alanı adını güncelledim
+    $irk = $_POST['irk']; // İnek ırkı alanı adını güncelledim
+    $dogum_tarihi = $_POST['dogum_tarihi'];
+
+    // Veritabanı bağlantısını yap
+    $db = dbBaglantisi();
+
+    if ($db instanceof PDO) {
+        // SQL sorgusunu hazırla
+        $query = $db->prepare("INSERT INTO inek (QR, ad, irk, dogum_tarihi, kullanici_id) VALUES (:QR, :ad, :irk, :dogum_tarihi, :kullanici_id)");
+
+        // Parametreleri bağla
+        $query->bindParam(':QR', $QR);
+        $query->bindParam(':ad', $ad);
+        $query->bindParam(':irk', $irk);
+        $query->bindParam(':dogum_tarihi', $dogum_tarihi);
+        $query->bindParam(':kullanici_id', $kullanici_id);
+        // Sorguyu çalıştır
+        if ($query->execute()) {
+            // Başarılı bir şekilde eklendiğinde kullanıcıyı başka bir sayfaya yönlendir
+            header("Location: gunlukKontrol.php");
+            exit();
+        } else {
+            // Ekleme işlemi başarısız olduysa hata mesajı oluştur
+            $error = "İnek kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.";
+        }
+    } else {
+        // Veritabanına bağlanılamadıysa hata mesajı oluştur
+        $error = "Veritabanı bağlantısı yapılamadı.";
+    }
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
     // Çıkış işlemi
@@ -74,7 +112,7 @@ $irk = "";
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8">
@@ -249,17 +287,17 @@ $irk = "";
                 <h1 class="text-white m-0">Kayıt </h1>
             </div>
             <div class="card-body rounded-bottom bg-white  ">
-                <form action="gunlukKontrol.php" method="POST">
+                <form action="inekKayit.php" method="POST">
                     <div class="form-group">
-                        <input type="text" class="form-control p-4" name="QR kodu" placeholder="QR kodu"
+                        <input type="text" class="form-control p-4" name="QR" placeholder="QR kodu"
                             value="<?php echo $next_qr_code; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control p-4" name="inek_irki" placeholder="Irk"
+                        <input type="text" class="form-control p-4" name="irk" placeholder="Irk"
                             value="<?php echo $irk; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control p-4" name="inek_adi" placeholder="Adı"
+                        <input type="text" class="form-control p-4" name="ad" placeholder="Adı"
                             value="<?php echo $ad; ?>" required="required" />
                     </div>
                     <div class="form-group">
