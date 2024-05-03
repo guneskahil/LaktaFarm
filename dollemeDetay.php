@@ -5,6 +5,22 @@ include_once "giris.php";
 
 $error = '';
 
+// Veritabanından döllenme sayısını çekmek için gerekli kod
+$dollenme_sayisi = '';
+if (isset($_GET['inek_id'])) {
+    $inek_id = $_GET['inek_id'];
+    $db = dbBaglantisi();
+    if ($db instanceof PDO) {
+        $sqlGetDollenme = "SELECT dollenme_sayisi FROM dollenme WHERE inek_id = :inek_id";
+        $stmtGetDollenme = $db->prepare($sqlGetDollenme);
+        $stmtGetDollenme->bindParam(':inek_id', $inek_id);
+        $stmtGetDollenme->execute();
+        $row = $stmtGetDollenme->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $dollenme_sayisi = $row['dollenme_sayisi'];
+        }
+    }
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
     // Formdan gelen verileri al
     $dollenme_sayisi = $_POST['dollenme_sayisi'];
@@ -18,21 +34,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
         $db = dbBaglantisi();
 
         if ($db instanceof PDO) {
-            // Güncelleme sorgusunu hazırla
-            $sql = "UPDATE dollenme 
-                    SET dollenme_sayisi = :dollenme_sayisi, 
-                        dollenme_durumu = :dollenme_durumu, 
-                        dollenme_tarihi = :dollenme_tarihi 
-                    WHERE inek_id = :inek_id";
+            // Döllenme sayısını veritabanından çek
+            $sqlGetDollenme = "SELECT dollenme_sayisi FROM dollenme WHERE inek_id = :inek_id";
+            $stmtGetDollenme = $db->prepare($sqlGetDollenme);
+            $stmtGetDollenme->bindParam(':inek_id', $inek_id);
+            $stmtGetDollenme->execute();
+            $dollenme_row = $stmtGetDollenme->fetch(PDO::FETCH_ASSOC);
+            $dollenme_sayisi = $dollenme_row['dollenme_sayisi'];
 
-            $stmt = $db->prepare($sql);
-            $stmt->bindParam(':inek_id', $inek_id);
-            $stmt->bindParam(':dollenme_sayisi', $dollenme_sayisi);
-            $stmt->bindParam(':dollenme_durumu', $dollenme_durumu);
-            $stmt->bindParam(':dollenme_tarihi', $dollenme_tarihi);
+            // Güncelleme sorgusunu hazırla
+            $sqlUpdateDollenme = "UPDATE dollenme 
+                                  SET dollenme_sayisi = :dollenme_sayisi, 
+                                      dollenme_durumu = :dollenme_durumu, 
+                                      dollenme_tarihi = :dollenme_tarihi 
+                                  WHERE inek_id = :inek_id";
+
+            $stmtUpdateDollenme = $db->prepare($sqlUpdateDollenme);
+
+            // Döllenme durumu "Hayır" olarak işaretlenirse, döllenme sayısını artır
+            if ($dollenme_durumu === "Hayır") {
+                $dollenme_sayisi++;
+                if ($dollenme_sayisi > 3) {
+                    // UPDATE sorgusunu oluştur
+                    $sqlUpdateGebelikDongu = "UPDATE inek SET gebelik_dongu_id = 3 WHERE inek_id = :inek_id";
+                    // Bağlantıyı hazırla ve sorguyu çalıştır
+                    $stmtUpdateGebelikDongu = $db->prepare($sqlUpdateGebelikDongu);
+                    $stmtUpdateGebelikDongu->bindParam(':inek_id', $inek_id);
+                    $stmtUpdateGebelikDongu->execute();
+                }
+            }
+
+            // Bağlantı parametrelerini bağla
+            $stmtUpdateDollenme->bindParam(':inek_id', $inek_id);
+            $stmtUpdateDollenme->bindParam(':dollenme_sayisi', $dollenme_sayisi);
+            $stmtUpdateDollenme->bindParam(':dollenme_durumu', $dollenme_durumu);
+            $stmtUpdateDollenme->bindParam(':dollenme_tarihi', $dollenme_tarihi);
 
             // Güncelleme sorgusunu çalıştır
-            if ($stmt->execute()) {
+            if ($stmtUpdateDollenme->execute()) {
+                // İneğin gebe olma durumunu güncelle
+                if ($dollenme_durumu === "Evet") {
+                    $sqlUpdateInek = "UPDATE inek SET gebelik_dongu_id = 2 WHERE inek_id = :inek_id";
+                    $stmtUpdateInek = $db->prepare($sqlUpdateInek);
+                    $stmtUpdateInek->bindParam(':inek_id', $inek_id);
+                    $stmtUpdateInek->execute();
+                }
                 header("Location: dollemeTakip.php");
                 exit();
             } else {
@@ -248,7 +294,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
                                     </div>
                                     <div class="col-md-8">
                                         <div class="input-group">
-                                            <input class="form-control p-4" type="text" name="dollenme_sayisi">
+                                            <!-- Döllenme sayısını form alanına yazdır -->
+                                            <input class="form-control p-4" type="text" name="dollenme_sayisi"
+                                                value="<?php echo $dollenme_sayisi; ?>" readonly>
                                         </div>
                                     </div>
                                 </div>
