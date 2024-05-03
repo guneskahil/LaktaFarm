@@ -1,50 +1,7 @@
 <?php
 // config.php dosyasını dahil et
 include_once "config.php";
-
-session_start();
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mail = $_POST['mail'];
-    $sifre = $_POST['sifre'];
-
-    $db = dbBaglantisi();
-
-    if ($db instanceof PDO) {
-        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
-        $query->bindParam(':mail', $mail);
-        $query->bindParam(':sifre', $sifre);
-        $query->execute();
-        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
-
-        if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            header("Location: index.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
-        } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
-            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
-        }
-    } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
-        $error = "Veritabanı bağlantısı yapılamadı.";
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
-    // Çıkış işlemi
-    session_unset();
-    session_destroy();
-    // Ana sayfaya yönlendirme
-    header("Location: index.php");
-    exit();
-}
-
-
-
-
-
+include_once "giris.php";
 ?>
 
 
@@ -216,8 +173,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     </div>
     <!-- Header End -->
 
- <!-- gebeMetin Start -->
- <div class="container-fluid py-5">
+    <!-- gebeMetin Start -->
+    <div class="container-fluid py-5">
         <div class="container pt-5">
             <div class="row">
                 <div class="col-lg-6" style="min-height: 500px;">

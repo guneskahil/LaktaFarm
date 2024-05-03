@@ -4,44 +4,15 @@ include_once "config.php";
 
 session_start();
 
-// Giriş işlemi
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mail']) && isset($_POST['sifre'])) {
-    $mail = $_POST['mail'];
-    $sifre = $_POST['sifre'];
-
-    $db = dbBaglantisi();
-
-    if ($db instanceof PDO) {
-        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
-        $query->bindParam(':mail', $mail);
-        $query->bindParam(':sifre', $sifre);
-        $query->execute();
-        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
-
-        if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad'];
-            $_SESSION['kullanici_id'] = $kullanici['kullanici_id'];
-            header("Location: anaSayfa.php");
-            exit();
-        } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
-            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
-        }
-    } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
-        $error = "Veritabanı bağlantısı yapılamadı.";
-    }
-}
 
 // Kaydetme işlemi
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
     // Formdan gelen verileri al
-    $ad = $_POST['ad']; 
-    $soyad = $_POST['soyad']; 
-    $mail = $_POST['mail']; 
+    $ad = $_POST['ad'];
+    $soyad = $_POST['soyad'];
+    $mail = $_POST['mail'];
     $sifre = $_POST['sifre'];
-    $kimlik_no = $_POST['kimlik_no']; 
+    $kimlik_no = $_POST['kimlik_no'];
     $tel_no = $_POST['tel_no'];
 
     // Veritabanı bağlantısını yap
@@ -74,14 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
-    // Çıkış işlemi
-    session_unset();
-    session_destroy();
-    // Ana sayfaya yönlendirme
-    header("Location: index.php");
-    exit();
-}
 ?>
 
 
@@ -254,40 +217,44 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
 
 
 
-<!-- kayıt -->
-<div class="container py-5" style="width: 50%; margin: 20px auto; text-align: center;">
-    <div class="card border-0 col-12">
-        <div class="card-header bg-primary text-center">
-            <h1 class="text-white m-0">Kayıt</h1>
-        </div>
-        <div class="card-body rounded-bottom bg-white">
-            <form action="kayit.php" method="POST">
-                <div class="form-group">
-                    <input type="text" class="form-control p-4" name="ad" placeholder="Adı" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control p-4" name="soyad" placeholder="Soyadı" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control p-4" id="kimlik_no" name="kimlik_no" placeholder="Kimlik Numarası" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control p-4" name="tel_no" placeholder="Telefon Numarası" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" class="form-control p-4" id="mail" name="mail" placeholder="E-posta Adresi" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" class="form-control p-4" id="sifre" name="sifre" placeholder="Şifre" required>
-                </div>
-                <div>
-                    <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
-                </div>
-            </form>
+    <!-- kayıt -->
+    <div class="container py-5" style="width: 50%; margin: 20px auto; text-align: center;">
+        <div class="card border-0 col-12">
+            <div class="card-header bg-primary text-center">
+                <h1 class="text-white m-0">Kayıt</h1>
+            </div>
+            <div class="card-body rounded-bottom bg-white">
+                <form action="kayit.php" method="POST">
+                    <div class="form-group">
+                        <input type="text" class="form-control p-4" name="ad" placeholder="Adı" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control p-4" name="soyad" placeholder="Soyadı" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control p-4" id="kimlik_no" name="kimlik_no"
+                            placeholder="Kimlik Numarası" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control p-4" name="tel_no" placeholder="Telefon Numarası"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control p-4" id="mail" name="mail" placeholder="E-posta Adresi"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control p-4" id="sifre" name="sifre" placeholder="Şifre"
+                            required>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-<!-- kayıt End -->
+    <!-- kayıt End -->
 
 
 
