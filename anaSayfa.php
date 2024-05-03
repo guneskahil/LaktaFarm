@@ -108,6 +108,16 @@ if ($db instanceof PDO) {
     <!-- Topbar Start -->
     <div class="container-fluid bg-light pt-3 d-none d-lg-block">
         <div class="container">
+            <div class="row justify-content-center">
+                <div class="weather-container row">
+                    <div class="weather-info row">
+                        <p style="padding-right:20px;"><strong>Şehir:</strong> <span id="city"></span></p>
+                        <p style="padding-right:20px;"><strong> Sıcaklık:</strong> <span id="temperature"></span>°C</p>
+                        <p style="padding-right:20px;"><strong> Hava Durumu:</strong> <span id="condition"></span></p>
+                        <p style="padding-right:20px;"><strong> Nem:</strong> <span id="humidity"></span>%</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Topbar End -->
@@ -170,6 +180,8 @@ if ($db instanceof PDO) {
     </div>
     <!-- Navbar End -->
 
+    <!-- Navbar End -->
+
     <!-- Modal Start -->
     <div id="myModal" class="modal">
         <div class="modal-content" style="border-radius: 20px !important;">
@@ -224,7 +236,7 @@ if ($db instanceof PDO) {
     <div class="container-fluid">
         <div class="container pt-5 pb-3">
             <div class="row">
-                <div class="col-lg-5 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <!-- Packages Start -->
                     <?php if (!empty($result_sut_dongu)): ?>
                         <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -267,7 +279,7 @@ if ($db instanceof PDO) {
                     <?php endif; ?>
 
                 </div>
-                <div class="col-lg-7 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
 
                     <?php if (!empty($result_gebelik_dongu)): ?>
                         <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -278,17 +290,15 @@ if ($db instanceof PDO) {
                                 </div>
                                 <div class="row">
                                     <?php foreach ($result_gebelik_dongu as $row): ?>
-                                        <div class="col-lg-4 col-md-6 mb-4">
+                                        <div class="col-lg-6 col-md-6 mb-4">
                                             <div class="package-item bg-white mb-2">
                                                 <?php
                                                 // Süt döngüsü için uygun resmi belirleme
                                                 $resim = '';
                                                 if ($row['gdongu_adi'] == 'Serviste') {
                                                     $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
-                                                } elseif($row['gdongu_adi'] == 'Gebe')  {
+                                                } else {
                                                     $resim = 'img/anasayfaGebe.jpeg';
-                                                }else{
-                                                    $resim = 'img/kuruMetin2.jpg';
                                                 }
                                                 ?>
                                                 <img class="img-fluid" src="<?php echo $resim; ?>" alt="">
@@ -316,10 +326,6 @@ if ($db instanceof PDO) {
             <!-- Packages End -->
         </div>
     </div>
-
-
-
-
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -376,7 +382,6 @@ if ($db instanceof PDO) {
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
@@ -392,7 +397,51 @@ if ($db instanceof PDO) {
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    <!-- JavaScript ile Hava Durumu Bilgisini Getirme ve Gösterme -->
+    <script>
+        const apiKey = '030fad8f4256b502acc41286b23d4229';
+        const latitude = '40.762402'; // Şehrin enlem koordinatını buraya girin
+        const longitude = '29.932949'; // Şehrin boylam koordinatını buraya girin
 
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`)
+            .then(response => response.json())
+            .then(data => {
+                const city = data.name; // Şehir adını alırken kullanılacak
+                const temperature = data.main.temp;
+                const condition = data.weather[0].description; // Hava durumu koşulunu alırken kullanılacak
+                const humidity = data.main.humidity;
+
+                // Türkçe hava durumu koşulları için çeviri
+                const turkishConditions = {
+                    'clear sky': 'Açık Hava',
+                    'few clouds': 'Az Bulutlu',
+                    'scattered clouds': 'Parçalı Bulutlu',
+                    'broken clouds': 'Bulutlu',
+                    'shower rain': 'Sağanak Yağışlı',
+                    'rain': 'Yağmurlu',
+                    'thunderstorm with rain': 'Gök Gürültülü Sağanak Yağışlı',
+                    'snow': 'Karlı',
+                    'mist': 'Sisli',
+
+                };
+
+                // Hava durumu koşulunu Türkçe olarak gösterme
+                const turkishCondition = turkishConditions[condition.toLowerCase()] || condition;
+
+                // HTML içine verileri yerleştirme
+                document.getElementById('city').textContent = city;
+                document.getElementById('temperature').textContent = temperature;
+                document.getElementById('condition').textContent = turkishCondition;
+                document.getElementById('humidity').textContent = humidity;
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                document.getElementById('city').textContent = 'Bilinmiyor';
+                document.getElementById('temperature').textContent = 'Bilinmiyor';
+                document.getElementById('condition').textContent = 'Bilinmiyor';
+                document.getElementById('humidity').textContent = 'Bilinmiyor';
+            });
+    </script>
 </body>
 
 </html>
