@@ -236,7 +236,7 @@ if ($db instanceof PDO) {
     <div class="container-fluid">
         <div class="container pt-5 pb-3">
             <div class="row">
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-5 col-md-6 mb-4">
                     <!-- Packages Start -->
                     <?php if (!empty($result_sut_dongu)): ?>
                         <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -279,7 +279,7 @@ if ($db instanceof PDO) {
                     <?php endif; ?>
 
                 </div>
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-7 col-md-6 mb-4">
 
                     <?php if (!empty($result_gebelik_dongu)): ?>
                         <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -290,15 +290,17 @@ if ($db instanceof PDO) {
                                 </div>
                                 <div class="row">
                                     <?php foreach ($result_gebelik_dongu as $row): ?>
-                                        <div class="col-lg-6 col-md-6 mb-4">
+                                        <div class="col-lg-4 col-md-6 mb-4">
                                             <div class="package-item bg-white mb-2">
                                                 <?php
-                                                // Süt döngüsü için uygun resmi belirleme
+                                                // gebelik döngüsü için uygun resmi belirleme
                                                 $resim = '';
                                                 if ($row['gdongu_adi'] == 'Serviste') {
                                                     $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
-                                                } else {
+                                                } elseif($row['gdongu_adi'] == 'Gebe') {
                                                     $resim = 'img/anasayfaGebe.jpeg';
+                                                }else{
+                                                    $resim = 'img/kuruMetin2.jpg';
                                                 }
                                                 ?>
                                                 <img class="img-fluid" src="<?php echo $resim; ?>" alt="">

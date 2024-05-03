@@ -90,6 +90,54 @@ function adminVerileriGetir()
 
 // Admin verilerini al
 $result = adminVerileriGetir();
+
+// Admin silme fonksiyonu
+function adminSil($admin_id)
+{
+    $db = dbBaglantisi();
+
+    if ($db instanceof PDO) {
+        try {
+            // SQL sorgusu
+            $sql = "DELETE FROM admin WHERE admin_id = :admin_id";
+
+            // SQL sorgusunu hazırlama
+            $stmt = $db->prepare($sql);
+
+            // Parametreleri bağlama
+            $stmt->bindParam(':admin_id', $admin_id);
+
+            // SQL sorgusunu çalıştırma
+            $stmt->execute();
+
+            // Silme işlemi başarılıysa true dön
+            return true;
+        } catch (PDOException $e) {
+            // Hata durumunda hata mesajını ekrana yazdırma
+            echo "Hata: " . $e->getMessage();
+            return false;
+        }
+    } else {
+        // Veritabanı bağlantısı sağlanamadı hatası
+        echo "Veritabanı bağlantısı sağlanamadı.";
+        return false;
+    }
+}
+
+// Formdan gelen admin_id'yi kullanarak admin silme işlemini gerçekleştirin
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
+    $admin_id = $_POST['admin_id'];
+
+    // Admin silme işlemi
+    if (adminSil($admin_id)) {
+        // Silme başarılıysa yönlendirme yapabilirsiniz
+        header("Location: adminTablo.php");
+        exit();
+    } else {
+        // Silme başarısızsa hata mesajı göster
+        echo "Admin silme işlemi başarısız.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -351,34 +399,41 @@ $result = adminVerileriGetir();
                 <div class="card-body px-0 pb-2">
                   <div class="table-responsive p-0">
                   <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Admin ID</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admin Mail</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Şifre</th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // Eğer verileri başarıyla çektinizse foreach döngüsüyle tabloyu oluşturun
-                                    if ($result) {
-                                        foreach ($result as $row) {
-                                    ?>
-                                            <tr>
-                                                <td><?php echo $row['admin_id']; ?></td>
-                                                <td><?php echo $row['admin_mail']; ?></td>
-                                                <td class="text-center"><?php echo $row['admin_sifre']; ?></td>
-                                            </tr>
-                                    <?php
-                                        }
-                                    } else {
-                                        // Veritabanından veri alınamadıysa hata mesajı göster
-                                        echo "<tr><td colspan='4'>Veri bulunamadı.</td></tr>";
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
+    <thead>
+        <tr>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Admin ID</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admin Mail</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Şifre</th>
+            <th class="text-secondary opacity-7"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Eğer verileri başarıyla çektinizse foreach döngüsüyle tabloyu oluşturun
+        if ($result) {
+            foreach ($result as $row) {
+        ?>
+                <tr>
+                    <td><?php echo $row['admin_id']; ?></td>
+                    <td><?php echo $row['admin_mail']; ?></td>
+                    <td class="text-center"><?php echo $row['admin_sifre']; ?></td>
+                    <td>
+                        <!-- Silme işlemi için form -->
+                        <form method="POST">
+                            <input type="hidden" name="admin_id" value="<?php echo $row['admin_id']; ?>">
+                            <button type="submit" class="btn btn-sm btn-danger" name="sil">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+        <?php
+            }
+        } else {
+            // Veritabanından veri alınamadıysa hata mesajı göster
+            echo "<tr><td colspan='4'>Veri bulunamadı.</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
                   </div>
                 </div>
               </div>

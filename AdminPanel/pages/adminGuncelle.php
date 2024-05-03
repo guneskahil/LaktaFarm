@@ -21,27 +21,28 @@ function dbBaglantisi()
     }
 }
 
-// Admin ekleme fonksiyonu
-function adminEkle($email, $sifre)
+// Admin bilgilerini güncelleme fonksiyonu
+function adminGuncelle($admin_id, $admin_mail, $admin_sifre)
 {
     $db = dbBaglantisi();
 
     if ($db instanceof PDO) {
         try {
             // SQL sorgusu
-            $sql = "INSERT INTO admin (admin_mail, admin_sifre) VALUES (:email, :sifre)";
+            $sql = "UPDATE admin SET admin_mail = :admin_mail, admin_sifre = :admin_sifre WHERE admin_id = :admin_id";
 
             // SQL sorgusunu hazırlama
             $stmt = $db->prepare($sql);
 
             // Parametreleri bağlama
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':sifre', $sifre);
+            $stmt->bindParam(':admin_id', $admin_id);
+            $stmt->bindParam(':admin_mail', $admin_mail);
+            $stmt->bindParam(':admin_sifre', $admin_sifre);
 
             // SQL sorgusunu çalıştırma
             $stmt->execute();
 
-            // Ekleme işlemi başarılıysa true dön
+            // Güncelleme işlemi başarılıysa true dön
             return true;
         } catch (PDOException $e) {
             // Hata durumunda hata mesajını ekrana yazdırma
@@ -55,24 +56,23 @@ function adminEkle($email, $sifre)
     }
 }
 
-// Formdan gelen verileri al ve admin eklemeyi deneyin
+// Formdan gelen verileri al ve admin güncellemeyi deneyin
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $sifre = $_POST['sifre'];
+    $admin_id = $_POST['admin_id'];
+    $admin_mail = $_POST['admin_mail'];
+    $admin_sifre = $_POST['admin_sifre'];
 
-    // Admin ekleme işlemi
-    if (adminEkle($email, $sifre)) {
-        // Ekleme başarılıysa yönlendirme yapabilirsiniz
+    // Admin güncelleme işlemi
+    if (adminGuncelle($admin_id, $admin_mail, $admin_sifre)) {
+        // Güncelleme başarılıysa yönlendirme yapabilirsiniz
         header("Location: adminTablo.php");
         exit();
     } else {
-        // Ekleme başarısızsa hata mesajı göster
-        echo "Admin ekleme işlemi başarısız.";
+        // Güncelleme başarısızsa hata mesajı göster
+        echo "Admin güncelleme işlemi başarısız.";
     }
 }
 ?>
-
-
 
 
 
@@ -332,25 +332,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="card z-index-0 fadeIn3 fadeInBottom">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                   <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-                    <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Admin Ekle</h4>
+                    <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Admin Bilgilerini Güncelle</h4>
                     <div class="row mt-3">
                     </div>
                   </div>
                 </div>
                 <div class="card-body">
-                <form role="form" class="text-start" method="POST" name="ekle" id="ekle">
-                   <div class="input-group input-group-outline my-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control">
-                   </div>
-                   <div class="input-group input-group-outline mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="sifre" class="form-control">
-                   </div>
-                   <div class="text-center">
-                     <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">ekle</button>
-                    </div>
-                </form>
+                <form role="form" class="text-start" method="POST" name="guncelle" id="guncelle">
+    <div class="input-group input-group-outline my-3">
+        <label class="form-label">Admin İD</label>
+        <input type="text" name="admin_id" class="form-control">
+        
+    </div>
+    <div class="input-group input-group-outline my-3">
+        <label class="form-label">Email</label>
+        <input type="mail" name="admin_mail" class="form-control">
+    </div>
+    <div class="input-group input-group-outline mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="admin_sifre" class="form-control">
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">Güncelle</button>
+    </div>
+</form>
+
                 </div>
               </div>
             </div>
