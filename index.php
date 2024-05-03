@@ -187,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
             <p style="text-align: center; margin-top: 10px;">
                 Hesabınız yok mu? <a href="kayit.php">Kayıt olun</a>.
             </p>
-            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
+            <label class="rememberme" for="rememberme"> <a href="adminPanel/pages/adminGiris.php">Admin Girişi</a></label>
         </div>
     </div>
     <!-- Modal End -->

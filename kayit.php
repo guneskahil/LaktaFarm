@@ -208,7 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
             <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
 
                 <div class="d-inline-flex text-white" style="font-size: 30px;">
-                    <p class="m-0 ">İnek Kayıt</p>
+                    <p class="m-0 ">Kayıt Ol</p>
                 </div>
             </div>
         </div>
@@ -221,7 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
     <div class="container py-5" style="width: 50%; margin: 20px auto; text-align: center;">
         <div class="card border-0 col-12">
             <div class="card-header bg-primary text-center">
-                <h1 class="text-white m-0">Kayıt</h1>
+                <h1 class="text-white m-0">Bilgilerim</h1>
             </div>
             <div class="card-body rounded-bottom bg-white">
                 <form action="kayit.php" method="POST">
@@ -248,7 +248,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
                             required>
                     </div>
                     <div>
-                        <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
+                        <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Bilgilerimi Kaydet</button>
                     </div>
                 </form>
             </div>

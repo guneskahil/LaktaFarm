@@ -22,12 +22,12 @@ if ($db instanceof PDO) {
                     WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) BETWEEN 305 AND 365 THEN 'Kuru Dönem'
         END AS sut_durum,
         CASE 
-            WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN 'Servis Periyodu'
+            WHEN GETDATE() < DATEADD(day, 86, i.dogurma_tarihi) THEN 'Servis Periyodu'
             WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodu'
             ELSE 'Sürüden Çıkarılmalı'
         END AS gebe_durum,
         CASE 
-            WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE())
+            WHEN GETDATE() < DATEADD(day, 86, i.dogurma_tarihi) THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE())
             WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
             ELSE NULL
         END AS gun
