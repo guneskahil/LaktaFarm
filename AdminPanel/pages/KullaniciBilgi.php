@@ -25,16 +25,18 @@ if ($db instanceof PDO) {
     try {
         // SQL sorgusu
         $sql = "SELECT 
-                    k.ad AS kullanici_adi,
-                    k.kimlik_no AS tc_kimlik_no,
-                    k.mail AS kullanici_mail,
-                    COUNT(i.inek_id) AS inek_miktari
-                FROM 
-                    kullanici k
-                LEFT JOIN 
-                    inek i ON k.kullanici_id = i.kullanici_id
-                GROUP BY 
-                    k.ad, k.kimlik_no, k.mail";
+            k.kullanici_id,
+            k.ad AS kullanici_adi,
+            k.kimlik_no AS tc_kimlik_no,
+            k.mail AS kullanici_mail,
+            COUNT(i.inek_id) AS inek_miktari
+        FROM 
+            kullanici k
+        LEFT JOIN 
+            inek i ON k.kullanici_id = i.kullanici_id
+        GROUP BY 
+            k.kullanici_id, k.ad, k.kimlik_no, k.mail";
+
 
         // SQL sorgusunu hazırlama
         $stmt = $db->prepare($sql);
@@ -56,6 +58,34 @@ if ($db instanceof PDO) {
 } else {
     // Veritabanı bağlantısı sağlanamadı hatası
     echo "Veritabanı bağlantısı sağlanamadı.";
+}
+// Formdan gelen veriyi işle
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
+  // Kullanıcı ID'sini al
+  $kullanici_id = $_POST['kullanici_id'];
+  
+  // Kullanıcıyı veritabanından silme işlemi
+  $db = dbBaglantisi();
+  if ($db instanceof PDO) {
+      try {
+          // SQL sorgusu
+          $sql = "DELETE FROM kullanici WHERE kullanici_id = :kullanici_id";
+          // SQL sorgusunu hazırlama
+          $stmt = $db->prepare($sql);
+          // Parametreleri bağlama
+          $stmt->bindParam(':kullanici_id', $kullanici_id);
+          // SQL sorgusunu çalıştırma
+          $stmt->execute();
+          // Kullanıcı başarıyla silindi mesajını göster
+          echo "Kullanıcı başarıyla silindi.";
+      } catch (PDOException $e) {
+          // Hata durumunda hata mesajını ekrana yazdırma
+          echo "Hata: " . $e->getMessage();
+      }
+  } else {
+      // Veritabanı bağlantısı sağlanamadı hatası
+      echo "Veritabanı bağlantısı sağlanamadı.";
+  }
 }
 
 ?>
@@ -102,13 +132,17 @@ if ($db instanceof PDO) {
         <li class="nav-item">
           <a class="nav-link text-white " href="../pages/dashboard.html">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">dashboard</i>
+            <div class="mt-2 d-flex">
+          <h6 class="mb-0">Light / Dark</h6>
+          <div class="form-check form-switch ps-5 ms-auto my-auto">
+            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
+          </div>
+        </div>
             </div>
-            <span class="nav-link-text ms-1">Ana Sayfa</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white active bg-gradient-primary" href="../pages/adminEkle.php">
+          <a class="nav-link text-white active bg-gradient-primary" href="../pages/KullaniciBilgi.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">receipt_long</i>
             </div>
@@ -116,70 +150,19 @@ if ($db instanceof PDO) {
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/billing.html">
+          <a class="nav-link text-white " href="../pages/adminTablo.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">receipt_long</i>
             </div>
-            <span class="nav-link-text ms-1">Billing</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/virtual-reality.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">view_in_ar</i>
-            </div>
-            <span class="nav-link-text ms-1">Virtual Reality</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/rtl.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">format_textdirection_r_to_l</i>
-            </div>
-            <span class="nav-link-text ms-1">RTL</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/notifications.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">notifications</i>
-            </div>
-            <span class="nav-link-text ms-1">Notifications</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/profile.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">person</i>
-            </div>
-            <span class="nav-link-text ms-1">Profile</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/sign-in.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">login</i>
-            </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/sign-up.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">assignment</i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Admin Bilgileri</span>
           </a>
         </li>
       </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
       <div class="mx-3">
-        <a class="btn btn-outline-primary mt-4 w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard?ref=sidebarfree" type="button">Documentation</a>
-        <a class="btn bg-gradient-primary w-100" href="https://www.creative-tim.com/product/material-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a>
+      <a class="btn btn-outline-primary mt-4 w-100" href="../pages/adminDuzenle.php" type="button">Admin Ekle</a>
+        <a class="btn bg-gradient-primary w-100" href="../pages/adminGiris.php" type="button">Çıkış Yap</a>
       </div>
     </div>
   </aside>
@@ -197,31 +180,33 @@ if ($db instanceof PDO) {
             </div>
             <div class="card-body px-0 pb-2">
               <div class="table-responsive p-0">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Kullanıcı Adı</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Kimlik Numarası</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">e-mail Adresi</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">sahip olduğu inek sayısı</th>
-           
-                      <th class="text-secondary opacity-7"></th>
-                    </tr>
-                  </thead>
-
-
-                  <tbody>
-                  <tbody>
-    <?php foreach ($result as $row): ?>
+              <table class="table align-items-center mb-0">
+    <thead>
         <tr>
-            <td><?php echo $row['kullanici_adi']; ?></td>
-            <td><?php echo $row['tc_kimlik_no']; ?></td>
-            <td class="text-center "><?php echo $row['kullanici_mail']; ?></td>
-            <td class="text-center "><?php echo $row['inek_miktari']; ?></td>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Kullanıcı Adı</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Kimlik Numarası</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">e-mail Adresi</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">sahip olduğu inek sayısı</th>
+            <th class="text-secondary opacity-7"></th>
         </tr>
-    <?php endforeach; ?>
-</tbody>
-                </table>
+    </thead>
+    <tbody>
+        <?php foreach ($result as $row): ?>
+            <tr>
+                <td><?php echo $row['kullanici_adi']; ?></td>
+                <td><?php echo $row['tc_kimlik_no']; ?></td>
+                <td class="text-center"><?php echo $row['kullanici_mail']; ?></td>
+                <td class="text-center"><?php echo $row['inek_miktari']; ?></td>
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="kullanici_id" value="<?php echo $row['kullanici_id']; ?>">
+                        <button type="submit" name="sil" class="btn btn-danger">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
               </div>
             </div>
           </div>
@@ -232,32 +217,6 @@ if ($db instanceof PDO) {
     </div>
   </main>
  
-        <!-- Navbar Fixed -->
-        <div class="mt-3 d-flex">
-          <h6 class="mb-0">Navbar Fixed</h6>
-          <div class="form-check form-switch ps-0 ms-auto my-auto">
-            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
-          </div>
-        </div>
-        <hr class="horizontal dark my-3">
-        <div class="mt-2 d-flex">
-          <h6 class="mb-0">Light / Dark</h6>
-          <div class="form-check form-switch ps-0 ms-auto my-auto">
-            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
-          </div>
-        </div>
-        <hr class="horizontal dark my-sm-4">
-        <a class="btn bg-gradient-info w-100" href="https://www.creative-tim.com/product/material-dashboard-pro">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard">View documentation</a>
-        <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/material-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/material-dashboard on GitHub">Star</a>
-          <h6 class="mt-3">Thank you for sharing!</h6>
-          <a href="https://twitter.com/intent/tweet?text=Check%20Material%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/material-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
-          </a>
         </div>
       </div>
     </div>
