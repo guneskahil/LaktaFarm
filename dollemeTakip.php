@@ -1,40 +1,88 @@
 <?php
 // config.php dosyasını dahil et
 include_once "config.php";
-include_once "giris.php";
+
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $mail = $_POST['mail'];
+    $sifre = $_POST['sifre'];
+
+    $db = dbBaglantisi(); // Veritabanı bağlantısını sağla
+
+    if ($db instanceof PDO) {
+        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
+        $query->bindParam(':mail', $mail);
+        $query->bindParam(':sifre', $sifre);
+        $query->execute();
+        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($kullanici) {
+            // Kullanıcı bulundu, giriş yap
+            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
+            $_SESSION['kullanici_id'] = $kullanici['kullanici_id']; // Kullanıcının id'sini oturum verilerine kaydet
+            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
+            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
+        } else {
+            // Kullanıcı bulunamadı, hata mesajı ayarla
+            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
+        }
+    } else {
+        // Veritabanına bağlanılamadı, hata mesajı ayarla
+        $error = "Veritabanı bağlantısı yapılamadı.";
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
+    // Çıkış işlemi
+    session_unset();
+    session_destroy();
+    // Ana sayfaya yönlendirme
+    header("Location: index.php");
+    exit();
+}
 
 $db = dbBaglantisi();
 if ($db instanceof PDO) {
     try {
-        // SQL sorgusu
-        $sql = "SELECT 
-            i.QR,
-            i.inek_id,
-            i.ad,
-            i.dogurma_tarihi,
-            d.dollenme_durumu,
-            CASE 
-                WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN 'Servis Periyodunda'
-                WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodunda'
-                ELSE 'Sürüden Çıkarılmalı'
-            END AS durum,
-            CASE 
-                WHEN GETDATE() < DATEADD(day, 85, i.dogurma_tarihi) THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE())
-                WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
-                ELSE NULL
-            END AS gun
-        FROM 
-            inek i
-        LEFT JOIN 
-            dollenme d ON i.inek_id = d.inek_id
-        WHERE
-            i.kullanici_id = :kullanici_id";
-
-        // SQL sorgusunu hazırlama
-        $stmt = $db->prepare($sql);
-
-        // Oturumda kullanıcı id'sini al
+        // Oturumda kullanıcı ID'sini al
         $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
+
+        // SQL sorgusunu hazırla
+        $sql = "SELECT
+        i.inek_id,
+        i.QR,
+        gd.gebelik_dongu_adi AS dongu_adi,
+        i.ad AS ad,
+        CASE
+            WHEN gd.gebelik_dongu_adi = 'serviste' THEN 
+                CASE 
+                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) < 0 THEN 0 
+                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) > 85 THEN 85 
+                    ELSE DATEDIFF(day, i.dogurma_tarihi, GETDATE())
+                END
+            WHEN gd.gebelik_dongu_adi = 'gebe' THEN 
+                CASE 
+                    WHEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) < 0 THEN 0 
+                    WHEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) > 280 THEN 280 
+                    ELSE DATEDIFF(day, d.dollenme_tarihi, GETDATE()) 
+                END
+            ELSE NULL
+        END AS gun
+    FROM
+        inek i
+    INNER JOIN
+        gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
+    LEFT JOIN
+        dollenme d ON i.inek_id = d.inek_id
+    WHERE
+        i.kullanici_id = :kullanici_id
+        AND ((gd.gebelik_dongu_adi = 'serviste' AND DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 85)
+             OR (gd.gebelik_dongu_adi = 'Sürüden Çikarilmali'))";
+
+
+        // SQL sorgusunu hazırla
+        $stmt = $db->prepare($sql);
 
         // SQL sorgusunu çalıştırma
         $stmt->execute([':kullanici_id' => $kullanici_id]);
@@ -44,7 +92,8 @@ if ($db instanceof PDO) {
 
         // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
         if (!$result) {
-
+            // Sonuç yoksa veya boşsa, uyarı mesajı göster
+            echo "Sonuç bulunamadı.";
         }
     } catch (PDOException $e) {
         // Hata durumunda hata mesajını ekrana yazdırma
@@ -244,26 +293,15 @@ if ($db instanceof PDO) {
                                 <tbody>
                                     <?php foreach ($result as $row): ?>
                                         <tr>
-                                            <td>
-                                                <?php if (isset($row['QR'])): ?>
-                                                    <?php echo $row['QR']; ?>
-                                                <?php else: ?>
-                                                    QR değeri yok
-                                                <?php endif; ?>
-                                            </td>
+                                            <td><?php echo isset($row['QR']) ? $row['QR'] : 'QR değeri yok'; ?></td>
                                             <td><?php echo $row['ad']; ?></td>
-                                            <td><?php echo $row['durum']; ?></td>
-                                            <td>
-                                                <?php if (isset($row['gun'])): ?>
-                                                    <?php echo $row['gun']; ?>
-                                                <?php else: ?>
-                                                    -
-                                                <?php endif; ?>
-                                            </td>
-                                            <td><a href="dollemedetay.php?inek_id=<?php echo $row['inek_id']; ?>"
+                                            <td><?php echo $row['dongu_adi']; ?></td>
+                                            <td><?php echo isset($row['gun']) ? $row['gun'] : '-'; ?></td>
+                                            <td><a href="dollemeDetay.php?inek_id=<?php echo $row['inek_id']; ?>"
                                                     class="btn btn-primary">Detay</a></td>
                                         </tr>
                                     <?php endforeach; ?>
+
                                 </tbody>
                             </table>
                         </div>
