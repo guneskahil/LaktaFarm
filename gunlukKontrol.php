@@ -130,7 +130,7 @@ if ($db instanceof PDO) {
     <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
-                <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
+                <img class="img-fluid" src="img/logo.jpg" style="height: 8%; width: 8%;" alt="">
                 <a href="anaSayfa.php" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
