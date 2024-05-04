@@ -271,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['profilGuncelle'])) {
                         </div>
                         <div class="form-group">
                             <label for="mail">Email</label>
-                            <input type="text" class="form-control" id="mail" name="mail"
+                            <input type="mail" class="form-control" id="mail" name="mail"
                                 value="<?php echo $_SESSION['mail']; ?>">
                         </div>
                         <div class="form-group">

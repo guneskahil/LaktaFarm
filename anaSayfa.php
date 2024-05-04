@@ -299,8 +299,8 @@ if ($db instanceof PDO) {
                                                     $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
                                                 } elseif($row['gdongu_adi'] == 'Gebe') {
                                                     $resim = 'img/anasayfaGebe.jpeg';
-                                                }else{
-                                                    $resim = 'img/kuruMetin2.jpg';
+                                                } elseif($row['gdongu_adi'] == 'Yenidogan') {
+                                                    $resim = 'img/yenidogan.jpg';
                                                 }
                                                 ?>
                                                 <img class="img-fluid" src="<?php echo $resim; ?>" alt="">
