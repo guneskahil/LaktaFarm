@@ -42,8 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
     }
 }
 
-
-
 $db = dbBaglantisi();
 
 if ($db instanceof PDO) {
@@ -64,6 +62,17 @@ if ($db instanceof PDO) {
         // Tabloda hiç inek yoksa
         $next_qr_code = 'inek1'; // İlk inek için QR kodu
     }
+    
+    // URL'den gelen ikinci inek_id'yi al
+    $inek_id_2 = isset($_GET['inek_id']) ? $_GET['inek_id'] : null;
+
+    // Doğurma tarihini güncelleme işlemi
+    if ($inek_id_2) {
+        $update_dogurma_tarihi_sql = "UPDATE inek SET dogurma_tarihi = GETDATE() WHERE inek_id = :inek_id";
+        $stmt_update_dogurma_tarihi = $db->prepare($update_dogurma_tarihi_sql);
+        $stmt_update_dogurma_tarihi->execute([':inek_id' => $inek_id_2]);
+    }
+    
 } else {
     echo "Veritabanı bağlantısı yapılamadı.";
 }
@@ -72,6 +81,7 @@ $ad = "";
 $dogum_tarihi = "";
 $irk = "";
 ?>
+
 
 
 

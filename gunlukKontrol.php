@@ -24,7 +24,7 @@ if ($db instanceof PDO) {
         END AS sut_durum,
         CASE 
             WHEN gebelik_dongu.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, dollenme.dollenme_tarihi, GETDATE())+1
-            WHEN gebelik_dongu.gebelik_dongu_adi = 'serviste' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'serviste' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())+1
             WHEN gebelik_dongu.gebelik_dongu_adi = 'yenidogan' THEN DATEDIFF(day, inek.dogum_tarihi, GETDATE())
             ELSE NULL
         END AS gun_farki
