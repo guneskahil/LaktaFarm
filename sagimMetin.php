@@ -110,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
-                <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
+                <img class="img-fluid" src="img/logo.jpg" style="height: 8%; width: 8%;" alt="">
                 <a href="anaSayfa.php" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
@@ -190,9 +190,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 </div>
             </form>
             <p style="text-align: center; margin-top: 10px;">
-                Hesabınız yok mu? <a href="kayit.html">Kayıt olun</a>.
+                Hesabınız yok mu? <a href="kayit.php">Kayıt olun</a>.
             </p>
-            <label class="rememberme" for="rememberme"><input type="checkbox" id="rememberme"> Beni Hatırla</label>
+            <label class="rememberme" for="rememberme"> <a href="adminPanel/pages/adminGiris.php">Admin Girişi</a></label>
         </div>
     </div>
     <!-- Modal End -->
@@ -231,22 +231,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <!-- Header End -->
 
 
-    <!-- About Start -->
-    <div class="container-fluid ">
-        <div class="container pt-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="position-relative h-100">
-                        <img class="position-absolute" src="img/sagimMetin.jpg"
-                            style="object-fit: cover; width: 500px; bottom: 180px; right: 100px;">
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-
-    <!-- About End -->
+ 
 <!-- sagimMetin Start -->
 <div class="container-fluid py-5">
         <div class="container pt-5">

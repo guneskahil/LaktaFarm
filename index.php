@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
     <div class="container-fluid position-relative nav-bar p-0">
         <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
-                <img class="img-fluid" src="img/inekikon.png" style="height: 8%; width: 8%;" alt="">
+                <img class="img-fluid" src="img/logo.jpg" style="height: 8%; width: 8%;" alt="">
                 <a href="anaSayfa.php" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">Lakta</span>Farm</h1>
                 </a>
@@ -248,7 +248,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
                         <img class="img-fluid" src="img/servis1.jpeg" alt="Servis Periyodu">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
+                        <a class="destination-overlay text-white text-decoration-none" href="servisPeriyoduMetin.php">
                             <h5 class="text-white">Servis Periyodu</h5>
                             <span>85 Gün</span>
                         </a>
@@ -257,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
                         <img class="img-fluid" src="img/gebe.jpeg" alt="Gebelik Periyodu">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
+                        <a class="destination-overlay text-white text-decoration-none" href="gebelikMetin.php">
                             <h5 class="text-white">Gebelik Periyodu </h5>
                             <span>280 gün</span>
                         </a>
@@ -266,7 +266,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
                         <img class="img-fluid" src="img/kuruda.jpeg" alt="Kuru Dönem Periyodu">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
+                        <a class="destination-overlay text-white text-decoration-none" href="kuruDonemMetin.php">
                             <h5 class="text-white">Kuru Dönem Periyodu</h5>
                             <span>60 Gün</span>
                         </a>
@@ -275,7 +275,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['acti
                 <div class="col-lg-6  mb-6">
                     <div class="destination-item position-relative overflow-hidden mb-2">
                         <img class="img-fluid" src="img/sağımsa3.jpeg" alt="Sağım Periyodu" style="height: %80px;">
-                        <a class="destination-overlay text-white text-decoration-none" href="">
+                        <a class="destination-overlay text-white text-decoration-none" href="sagimMetin.php">
                             <h5 class="text-white">Sağım Periyodu</h5>
                             <span>305 Gün</span>
                         </a>

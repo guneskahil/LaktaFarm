@@ -64,18 +64,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
   // Kullanıcı ID'sini al
   $kullanici_id = $_POST['kullanici_id'];
   
-  // Kullanıcıyı veritabanından silme işlemi
+  // Kullanıcıya ait "inek" kayıtlarını sil
   $db = dbBaglantisi();
   if ($db instanceof PDO) {
       try {
-          // SQL sorgusu
-          $sql = "DELETE FROM kullanici WHERE kullanici_id = :kullanici_id";
-          // SQL sorgusunu hazırlama
-          $stmt = $db->prepare($sql);
-          // Parametreleri bağlama
-          $stmt->bindParam(':kullanici_id', $kullanici_id);
-          // SQL sorgusunu çalıştırma
-          $stmt->execute();
+        // "dollenme" tablosundan kullanıcıya ait olan kayıtları sil
+$sql_dollenme_sil = "DELETE FROM dollenme WHERE inek_id IN (SELECT inek_id FROM inek WHERE kullanici_id = :kullanici_id)";
+$stmt_dollenme_sil = $db->prepare($sql_dollenme_sil);
+$stmt_dollenme_sil->bindParam(':kullanici_id', $kullanici_id);
+$stmt_dollenme_sil->execute();
+
+        // "sut_olcum" tablosundan kullanıcıya ait olan kayıtları sil
+$sql_sut_olcum_sil = "DELETE FROM sut_olcum WHERE QR IN (SELECT QR FROM inek WHERE kullanici_id = :kullanici_id)";
+$stmt_sut_olcum_sil = $db->prepare($sql_sut_olcum_sil);
+$stmt_sut_olcum_sil->bindParam(':kullanici_id', $kullanici_id);
+$stmt_sut_olcum_sil->execute();
+
+        // "kilo_olcum" tablosundan kullanıcıya ait olan kayıtları sil
+$sql_kilo_olcum_sil = "DELETE FROM kilo_olcum WHERE QR IN (SELECT QR FROM inek WHERE kullanici_id = :kullanici_id)";
+$stmt_kilo_olcum_sil = $db->prepare($sql_kilo_olcum_sil);
+$stmt_kilo_olcum_sil->bindParam(':kullanici_id', $kullanici_id);
+$stmt_kilo_olcum_sil->execute();
+          // "inek" tablosundaki kullanıcıya ait kayıtları silme işlemi
+          $sql_inek_sil = "DELETE FROM inek WHERE kullanici_id = :kullanici_id";
+          $stmt_inek_sil = $db->prepare($sql_inek_sil);
+          $stmt_inek_sil->bindParam(':kullanici_id', $kullanici_id);
+          $stmt_inek_sil->execute();
+
+          // Kullanıcıyı veritabanından silme işlemi
+          $sql_kullanici_sil = "DELETE FROM kullanici WHERE kullanici_id = :kullanici_id";
+          $stmt_kullanici_sil = $db->prepare($sql_kullanici_sil);
+          $stmt_kullanici_sil->bindParam(':kullanici_id', $kullanici_id);
+          $stmt_kullanici_sil->execute();
+
           // Kullanıcı başarıyla silindi mesajını göster
           echo "Kullanıcı başarıyla silindi.";
       } catch (PDOException $e) {
@@ -87,7 +108,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
       echo "Veritabanı bağlantısı sağlanamadı.";
   }
 }
-
 ?>
 
 <!DOCTYPE html>
