@@ -6,51 +6,51 @@ include_once "giris.php";
 $db = dbBaglantisi();
 if ($db instanceof PDO) {
     try {
-        // SQL sorgusu
-        $sql = "SELECT
-        i.inek_id,
-        i.QR,
-        i.ad,
-        i.dogurma_tarihi,
-        gd.gebelik_dongu_adi,
+       // SQL sorgusu
+$sql = "SELECT
+i.inek_id,
+i.QR,
+i.ad,
+i.dogurma_tarihi,
+gd.gebelik_dongu_adi,
+CASE
+    WHEN gd.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) + 1
+    WHEN gd.gebelik_dongu_adi = 'serviste' THEN
         CASE
-            WHEN gd.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) + 1
-            WHEN gd.gebelik_dongu_adi = 'serviste' THEN
-                CASE
-                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 10 THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) + 1
-                    ELSE NULL
-                END
+            WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) > 86 THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) + 1
             ELSE NULL
-        END AS gebelik_gunu
-    FROM
-        inek i
-    INNER JOIN
-        dollenme d ON i.inek_id = d.inek_id
-    INNER JOIN
-        gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
-    WHERE
-        ((gd.gebelik_dongu_adi = 'gebe')
-        OR (gd.gebelik_dongu_adi = 'serviste' AND DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 10))
-        AND i.kullanici_id = :kullanici_id     
-    ";
+        END
+    ELSE NULL
+END AS gebelik_gunu
+FROM
+inek i
+LEFT JOIN
+dollenme d ON i.inek_id = d.inek_id
+LEFT JOIN
+gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
+WHERE
+(gd.gebelik_dongu_adi = 'gebe' OR (gd.gebelik_dongu_adi = 'serviste' AND DATEDIFF(day, i.dogurma_tarihi, GETDATE()) > 86))
+AND i.kullanici_id = :kullanici_id     
+";
 
+// SQL sorgusunu hazırlama
+$stmt = $db->prepare($sql);
 
-        // SQL sorgusunu hazırlama
-        $stmt = $db->prepare($sql);
+// Oturumda kullanıcı id'sini al
+$kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
 
-        // Oturumda kullanıcı id'sini al
-        $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
+// SQL sorgusunu çalıştırma
+$stmt->execute([':kullanici_id' => $kullanici_id]);
 
-        // SQL sorgusunu çalıştırma
-        $stmt->execute([':kullanici_id' => $kullanici_id]);
+// Sonuçları alma
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Sonuçları alma
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
-        if (!$result) {
+// Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
+if (!$result || empty($result)) {
+echo "Sonuç bulunamadı.";
+}
             // Sonuç yoksa bir işlem yapılabilir.
-        } else {
+         else {
             foreach ($result as $row) {
                 // Gebelik günü 280 gün veya daha fazlaysa
                 if ($row['gebelik_gunu'] >= 280) {
@@ -75,8 +75,6 @@ if ($db instanceof PDO) {
                     $stmt_dollenme_update->execute([':inek_id' => $row['inek_id']]);
                 }
             }
-
-
         }
     } catch (PDOException $e) {
         // Hata durumunda hata mesajını ekrana yazdırma
@@ -87,6 +85,7 @@ if ($db instanceof PDO) {
     echo "Veritabanı bağlantısı sağlanamadı.";
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -295,7 +294,7 @@ if ($db instanceof PDO) {
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php if ($row['gebelik_dongu_adi'] === 'Serviste' && $row['gebelik_gunu'] <= 10): ?>
+                                                <?php if ($row['gebelik_dongu_adi'] === 'Serviste'  ): ?>
                                                     <a href="inekKayit.php?inek_id=<?php echo $row['inek_id']; ?>"
                                                         class="btn btn-primary">Yenidoğan Ekle</a>
                                                 <?php endif; ?>
