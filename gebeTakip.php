@@ -6,8 +6,8 @@ include_once "giris.php";
 $db = dbBaglantisi();
 if ($db instanceof PDO) {
     try {
-       // SQL sorgusu
-$sql = "SELECT
+        // SQL sorgusu
+        $sql = "SELECT
 i.inek_id,
 i.QR,
 i.ad,
@@ -33,24 +33,24 @@ WHERE
 AND i.kullanici_id = :kullanici_id     
 ";
 
-// SQL sorgusunu hazırlama
-$stmt = $db->prepare($sql);
+        // SQL sorgusunu hazırlama
+        $stmt = $db->prepare($sql);
 
-// Oturumda kullanıcı id'sini al
-$kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
+        // Oturumda kullanıcı id'sini al
+        $kullanici_id = isset($_SESSION['kullanici_id']) ? $_SESSION['kullanici_id'] : null;
 
-// SQL sorgusunu çalıştırma
-$stmt->execute([':kullanici_id' => $kullanici_id]);
+        // SQL sorgusunu çalıştırma
+        $stmt->execute([':kullanici_id' => $kullanici_id]);
 
-// Sonuçları alma
-$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Sonuçları alma
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
-if (!$result || empty($result)) {
-echo "Sonuç bulunamadı.";
-}
-            // Sonuç yoksa bir işlem yapılabilir.
-         else {
+        // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
+        if (!$result || empty($result)) {
+            echo "Sonuç bulunamadı.";
+        }
+        // Sonuç yoksa bir işlem yapılabilir.
+        else {
             foreach ($result as $row) {
                 // Gebelik günü 280 gün veya daha fazlaysa
                 if ($row['gebelik_gunu'] >= 280) {
@@ -277,7 +277,7 @@ echo "Sonuç bulunamadı.";
                                             <td><?php echo $row['ad']; ?></td>
                                             <td>
                                                 <?php
-                                                if ($row['gebelik_dongu_adi'] == 'Serviste' && $row['gebelik_gunu'] <= 10) {
+                                                if ($row['gebelik_dongu_adi'] == 'Serviste') {
                                                     echo 'Doğum Yaptı';
                                                 } else {
                                                     echo $row['gebelik_dongu_adi'];
@@ -286,7 +286,7 @@ echo "Sonuç bulunamadı.";
                                             </td>
                                             <td>
                                                 <?php
-                                                if ($row['gebelik_dongu_adi'] == 'Serviste' && $row['gebelik_gunu'] <= 10) {
+                                                if ($row['gebelik_dongu_adi'] == 'Serviste') {
                                                     echo '-';
                                                 } else {
                                                     echo $row['gebelik_gunu'];
@@ -294,7 +294,7 @@ echo "Sonuç bulunamadı.";
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php if ($row['gebelik_dongu_adi'] === 'Serviste'  ): ?>
+                                                <?php if ($row['gebelik_dongu_adi'] === 'Serviste'): ?>
                                                     <a href="inekKayit.php?inek_id=<?php echo $row['inek_id']; ?>"
                                                         class="btn btn-primary">Yenidoğan Ekle</a>
                                                 <?php endif; ?>

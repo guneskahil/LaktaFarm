@@ -18,14 +18,14 @@ if ($db instanceof PDO) {
         kilo_olcum.kilo,
         sut_olcum.sut_miktar,
         CASE 
-                    WHEN sut_dongu.sut_dongu_adi = 'sagimda' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())  
+                    WHEN sut_dongu.sut_dongu_adi = 'sagimda' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())  +1
                     WHEN sut_dongu.sut_dongu_adi = 'kuruda' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE()) - 305
                     ELSE NULL 
         END AS sut_durum,
         CASE 
             WHEN gebelik_dongu.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, dollenme.dollenme_tarihi, GETDATE())+1
             WHEN gebelik_dongu.gebelik_dongu_adi = 'serviste' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())+1
-            WHEN gebelik_dongu.gebelik_dongu_adi = 'yenidogan' THEN DATEDIFF(day, inek.dogum_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'yenidogan' THEN DATEDIFF(day, inek.dogum_tarihi, GETDATE())+1
             ELSE NULL
         END AS gun_farki
     FROM 
