@@ -236,7 +236,7 @@ if ($db instanceof PDO) {
     <div class="container-fluid">
         <div class="container pt-5 pb-3">
             <div class="row">
-                <div class="col-lg-5 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <!-- Packages Start -->
                     <?php if (!empty($result_sut_dongu)): ?>
                         <!-- $result_sut_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -254,6 +254,8 @@ if ($db instanceof PDO) {
                                                 $resim = '';
                                                 if ($row['sdongu_adi'] == 'Sagimda') {
                                                     $resim = 'img/anasayfaSagımda1.jpeg'; // Resim adı düzeltildi
+                                                }elseif($row['sdongu_adi'] == 'Sürüden Çikarilmali') {
+                                                    $resim = 'img/kuruMetin3.jpg';
                                                 } else {
                                                     $resim = 'img/anasayfaKuruda.jpeg';
                                                 }
@@ -279,7 +281,7 @@ if ($db instanceof PDO) {
                     <?php endif; ?>
 
                 </div>
-                <div class="col-lg-7 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
 
                     <?php if (!empty($result_gebelik_dongu)): ?>
                         <!-- $result_gebelik_dongu üzerinde döngü yapın ve verileri görüntüleyin -->
@@ -290,7 +292,7 @@ if ($db instanceof PDO) {
                                 </div>
                                 <div class="row">
                                     <?php foreach ($result_gebelik_dongu as $row): ?>
-                                        <div class="col-lg-4 col-md-6 mb-4">
+                                        <div class="col-lg-6 col-md-6 mb-4">
                                             <div class="package-item bg-white mb-2">
                                                 <?php
                                                 // gebelik döngüsü için uygun resmi belirleme
@@ -299,9 +301,11 @@ if ($db instanceof PDO) {
                                                     $resim = 'img/anasayfaServis.jpeg'; // Resim adı düzeltildi
                                                 } elseif($row['gdongu_adi'] == 'Gebe') {
                                                     $resim = 'img/anasayfaGebe.jpeg';
-                                                } elseif($row['gdongu_adi'] == 'Yenidogan') {
+                                                }elseif($row['gdongu_adi'] == 'Yenidogan') {
                                                     $resim = 'img/yenidogan.jpg';
-                                                }
+                                                }elseif($row['gdongu_adi'] == 'Sürüden Çikarilmali') {
+                                                    $resim = 'img/cikarilmali.jpg';
+                                                } 
                                                 ?>
                                                 <img class="img-fluid" src="<?php echo $resim; ?>" alt="">
                                                 <div class="p-4">
