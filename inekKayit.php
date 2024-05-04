@@ -265,7 +265,7 @@ $irk = "";
                             value="<?php echo $ad; ?>" required="required" />
                     </div>
                     <div class="form-group">
-                        <input type="date" class="form-control p-4" id="birthDateInput" name="dogum_tarihi"
+                        <input type="date" class="form-control p-4" name="dogum_tarihi"
                             value="<?php echo $dogum_tarihi; ?>" required="required" />
                     </div>
                     <div>

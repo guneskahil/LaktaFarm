@@ -11,15 +11,17 @@ if ($db instanceof PDO) {
         i.inek_id,
         i.QR,
         i.ad,
+        i.dogurma_tarihi,
         gd.gebelik_dongu_adi,
         CASE
-            WHEN gd.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, d.dollenme_tarihi,GETDATE())
+            WHEN gd.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) + 1
+            WHEN gd.gebelik_dongu_adi = 'serviste' THEN
+                CASE
+                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 10 THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) + 1
+                    ELSE NULL
+                END
             ELSE NULL
-        END AS gebelik_gunu,
-        CASE
-            WHEN DATEDIFF(day, d.dollenme_tarihi,GETDATE()) >= 280 THEN 'Doğum Yaptı'
-            ELSE NULL
-        END AS dogum_durumu
+        END AS gebelik_gunu
     FROM
         inek i
     INNER JOIN
@@ -27,9 +29,11 @@ if ($db instanceof PDO) {
     INNER JOIN
         gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
     WHERE
-        gd.gebelik_dongu_adi = 'gebe'
-        AND d.dollenme_durumu = 'evet'
-        AND i.kullanici_id = :kullanici_id";
+        ((gd.gebelik_dongu_adi = 'gebe')
+        OR (gd.gebelik_dongu_adi = 'serviste' AND DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 10))
+        AND i.kullanici_id = :kullanici_id     
+    ";
+
 
         // SQL sorgusunu hazırlama
         $stmt = $db->prepare($sql);
@@ -59,7 +63,7 @@ if ($db instanceof PDO) {
                     $sql_dollenme_update = "UPDATE dollenme SET dollenme_durumu = 'hayir' WHERE inek_id = :inek_id";
                     $stmt_dollenme_update = $db->prepare($sql_dollenme_update);
                     $stmt_dollenme_update->execute([':inek_id' => $row['inek_id']]);
-                } elseif ($row['dogum_durumu'] === 'Doğum Yaptı') {
+
                     // Doğum yapan bir ineği servis periyoduna almak için gebelik_dongu_id'yi ve sut_dongu_id'yi güncelle
                     $sql_update = "UPDATE inek SET gebelik_dongu_id = 1, sut_dongu_id = 2 WHERE inek_id = :inek_id";
                     $stmt_update = $db->prepare($sql_update);
@@ -272,11 +276,26 @@ if ($db instanceof PDO) {
                                         <tr>
                                             <td><?php echo $row['QR']; ?></td>
                                             <td><?php echo $row['ad']; ?></td>
-                                            <td><?php echo $row['gebelik_gunu'] >= 280 ? 'Doğum Yaptı' : $row['gebelik_dongu_adi']; ?>
-                                            </td>
-                                            <td><?php echo $row['gebelik_gunu'] >= 280 ? '-' : $row['gebelik_gunu']; ?></td>
                                             <td>
-                                                <?php if ($row['gebelik_gunu'] >= 280): ?>
+                                                <?php
+                                                if ($row['gebelik_dongu_adi'] == 'Serviste' && $row['gebelik_gunu'] <= 10) {
+                                                    echo 'Doğum Yaptı';
+                                                } else {
+                                                    echo $row['gebelik_dongu_adi'];
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                if ($row['gebelik_dongu_adi'] == 'Serviste' && $row['gebelik_gunu'] <= 10) {
+                                                    echo '-';
+                                                } else {
+                                                    echo $row['gebelik_gunu'];
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($row['gebelik_dongu_adi'] === 'Serviste' && $row['gebelik_gunu'] <= 10): ?>
                                                     <a href="inekKayit.php?inek_id=<?php echo $row['inek_id']; ?>"
                                                         class="btn btn-primary">Yenidoğan Ekle</a>
                                                 <?php endif; ?>
