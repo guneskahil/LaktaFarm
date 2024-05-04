@@ -1,46 +1,7 @@
 <?php
 // config.php dosyasını dahil et
 include_once "config.php";
-
-session_start();
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mail = $_POST['mail'];
-    $sifre = $_POST['sifre'];
-
-    $db = dbBaglantisi(); // Veritabanı bağlantısını sağla
-
-    if ($db instanceof PDO) {
-        $query = $db->prepare("SELECT * FROM kullanici WHERE mail = :mail AND sifre = :sifre");
-        $query->bindParam(':mail', $mail);
-        $query->bindParam(':sifre', $sifre);
-        $query->execute();
-        $kullanici = $query->fetch(PDO::FETCH_ASSOC);
-
-        if ($kullanici) {
-            // Kullanıcı bulundu, giriş yap
-            $_SESSION['ad'] = $kullanici['ad']; // Kullanıcının adını oturum verilerine kaydet
-            $_SESSION['kullanici_id'] = $kullanici['kullanici_id']; // Kullanıcının id'sini oturum verilerine kaydet
-            header("Location: anaSayfa.php"); // Ana sayfaya yönlendir
-            exit(); // Yönlendirme yapıldıktan sonra kodun devamını çalıştırmamak için exit kullanılmalı
-        } else {
-            // Kullanıcı bulunamadı, hata mesajı ayarla
-            $error = "Hatalı giriş bilgileri. Lütfen tekrar deneyin.";
-        }
-    } else {
-        // Veritabanına bağlanılamadı, hata mesajı ayarla
-        $error = "Veritabanı bağlantısı yapılamadı.";
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action']) && $_GET['action'] == 'logout') {
-    // Çıkış işlemi
-    session_unset();
-    session_destroy();
-    // Ana sayfaya yönlendirme
-    header("Location: index.php");
-    exit();
-}
+include_once "giris.php";
 
 $db = dbBaglantisi();
 if ($db instanceof PDO) {
@@ -50,36 +11,41 @@ if ($db instanceof PDO) {
 
         // SQL sorgusunu hazırla
         $sql = "SELECT
-        i.inek_id,
-        i.QR,
-        gd.gebelik_dongu_adi AS dongu_adi,
-        i.ad AS ad,
-        CASE
-            WHEN gd.gebelik_dongu_adi = 'serviste' THEN 
-                CASE 
-                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) < 0 THEN 0 
-                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) > 85 THEN 85 
-                    ELSE DATEDIFF(day, i.dogurma_tarihi, GETDATE())
-                END
-            WHEN gd.gebelik_dongu_adi = 'gebe' THEN 
-                CASE 
-                    WHEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) < 0 THEN 0 
-                    WHEN DATEDIFF(day, d.dollenme_tarihi, GETDATE()) > 280 THEN 280 
-                    ELSE DATEDIFF(day, d.dollenme_tarihi, GETDATE()) 
-                END
-            ELSE NULL
-        END AS gun
-    FROM
-        inek i
-    INNER JOIN
-        gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
-    LEFT JOIN
-        dollenme d ON i.inek_id = d.inek_id
-    WHERE
-        i.kullanici_id = :kullanici_id
-        AND ((gd.gebelik_dongu_adi = 'serviste' AND DATEDIFF(day, i.dogurma_tarihi, GETDATE()) <= 85)
-             OR (gd.gebelik_dongu_adi = 'Sürüden Çikarilmali'))";
-
+    i.inek_id,
+    i.ad,
+    i.QR,
+    CASE
+        WHEN i.gebelik_dongu_id = 1 THEN
+            CASE
+                WHEN DATEDIFF(day, GETDATE(), i.dogurma_tarihi) > 85 THEN 3
+                ELSE i.gebelik_dongu_id
+            END
+        WHEN i.gebelik_dongu_id = 3 THEN 3
+    END AS gebelik_dongu_id,
+    CASE
+        WHEN i.gebelik_dongu_id = 1 THEN
+            CASE
+                WHEN DATEDIFF(day, GETDATE(), i.dogurma_tarihi) > 85 THEN 'Sürüden Çikarilmali'
+                ELSE 'Serviste'
+            END
+        WHEN i.gebelik_dongu_id = 3 THEN 'Sürüden Çikarilmali'
+    END AS dongu_adi,
+    i.ad AS ad,
+    CASE
+        WHEN i.gebelik_dongu_id = 1 THEN
+            CASE
+                WHEN DATEDIFF(day,i.dogurma_tarihi, GETDATE()) < 0 THEN 0
+                WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) > 85 THEN 85
+                ELSE DATEDIFF(day, i.dogurma_tarihi, GETDATE())
+            END
+        ELSE NULL
+    END AS gun
+FROM
+    inek i
+WHERE
+    i.kullanici_id = :kullanici_id
+    AND i.gebelik_dongu_id IN (1, 3)
+";
 
         // SQL sorgusunu hazırla
         $stmt = $db->prepare($sql);
@@ -92,9 +58,28 @@ if ($db instanceof PDO) {
 
         // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
         if (!$result) {
-            // Sonuç yoksa veya boşsa, uyarı mesajı göster
-            echo "Sonuç bulunamadı.";
+            echo "";
         }
+
+        $sql2 = "UPDATE inek
+         SET gebelik_dongu_id = 3
+         WHERE inek_id = :inek_id
+         ";
+
+        foreach ($result as $row) {
+            $inek_id = $row['inek_id'];
+            // Gebelik döngü adını kontrol et
+            if ($row['dongu_adi'] === 'Sürüden Çikarilmali') {
+                // Doluluk durumunu kontrol et
+                if ($row['gun'] === 'Sürüden Çikarilmali') {
+                    // Update sorgusunu hazırla
+                    $stmt2 = $db->prepare($sql2);
+                    // Update sorgusunu çalıştırma
+                    $stmt2->execute([':inek_id' => $inek_id]);
+                }
+            }
+        }
+
     } catch (PDOException $e) {
         // Hata durumunda hata mesajını ekrana yazdırma
         echo "Hata: " . $e->getMessage();
@@ -103,7 +88,37 @@ if ($db instanceof PDO) {
     // Veritabanı bağlantısı sağlanamadı hatası
     echo "Veritabanı bağlantısı sağlanamadı.";
 }
+
+if (isset($_GET['delete_inek'])) {
+    $inek_id = $_GET['delete_inek'];
+
+    // Diğer tablolardaki verileri sil
+    $sql_delete_sut_olcum = "DELETE FROM sut_olcum WHERE QR = (SELECT QR FROM inek WHERE inek_id = $inek_id)";
+    $sql_delete_kilo_olcum = "DELETE FROM kilo_olcum WHERE QR = (SELECT QR FROM inek WHERE inek_id = $inek_id)";
+    $sql_delete_dollenme = "DELETE FROM dollenme WHERE inek_id = $inek_id";
+
+    try {
+        // Prepare and execute the deletion queries
+        $stmt1 = $db->prepare($sql_delete_sut_olcum);
+        $stmt1->execute();
+        $stmt2 = $db->prepare($sql_delete_kilo_olcum);
+        $stmt2->execute();
+        $stmt3 = $db->prepare($sql_delete_dollenme);
+        $stmt3->execute();
+
+        // Delete the cow from the 'inek' table
+        $sql_delete_inek = "DELETE FROM inek WHERE inek_id = $inek_id";
+        $stmt4 = $db->prepare($sql_delete_inek);
+        $stmt4->execute();
+
+        // Redirect or show a success message to the user
+    } catch (PDOException $e) {
+        // Handle errors
+        echo "Error: " . $e->getMessage();
+    }
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="tr">
@@ -287,7 +302,7 @@ if ($db instanceof PDO) {
                                         <th>Adı</th>
                                         <th>Döngü Adı</th>
                                         <th>Döngünün Kaçıncı Günü</th>
-                                        <th>Detay</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -296,13 +311,23 @@ if ($db instanceof PDO) {
                                             <td><?php echo isset($row['QR']) ? $row['QR'] : 'QR değeri yok'; ?></td>
                                             <td><?php echo $row['ad']; ?></td>
                                             <td><?php echo $row['dongu_adi']; ?></td>
-                                            <td><?php echo isset($row['gun']) ? $row['gun'] : '-'; ?></td>
-                                            <td><a href="dollemeDetay.php?inek_id=<?php echo $row['inek_id']; ?>"
-                                                    class="btn btn-primary">Detay</a></td>
+                                            <td><?php echo ($row['dongu_adi'] === 'Sürüden Çikarilmali') ? '-' : $row['gun']; ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($row['dongu_adi'] === 'Sürüden Çikarilmali'): ?>
+                                                    <a href="dollemeTakip.php?delete_inek=<?php echo $row['inek_id']; ?>"
+                                                        class="btn btn-danger">İneği Sil</a>
+
+
+                                                <?php else: ?>
+                                                    <a href="dollemeDetay.php?inek_id=<?php echo $row['inek_id']; ?>"
+                                                        class="btn btn-primary">Detay</a>
+                                                <?php endif; ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
-
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

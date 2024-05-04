@@ -7,32 +7,29 @@ $db = dbBaglantisi();
 if ($db instanceof PDO) {
     try {
         // SQL sorgusu
-        $sql = "SELECT 
+        $sql = "SELECT
+        i.inek_id,
         i.QR,
         i.ad,
-        gd.gebelik_dongu_adi AS döngü_adi,
-        CASE 
-            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodunda'
-            ELSE 'Sürüden Çıkarılmalı'
-        END AS durum,
-        CASE 
-            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
+        gd.gebelik_dongu_adi,
+        CASE
+            WHEN gd.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, d.dollenme_tarihi,GETDATE())
             ELSE NULL
-        END AS gun
-    FROM 
+        END AS gebelik_gunu,
+        CASE
+            WHEN DATEDIFF(day, d.dollenme_tarihi,GETDATE()) >= 280 THEN 'Doğum Yaptı'
+            ELSE NULL
+        END AS dogum_durumu
+    FROM
         inek i
-    LEFT JOIN 
+    INNER JOIN
         dollenme d ON i.inek_id = d.inek_id
-    LEFT JOIN 
+    INNER JOIN
         gebelik_dongu gd ON i.gebelik_dongu_id = gd.gebelik_dongu_id
     WHERE
-        i.kullanici_id = :kullanici_id AND
-        (
-            d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi)
-            OR
-            i.inek_id IN (SELECT inek_id FROM dollenme WHERE dollenme_durumu = 'hayır')
-        )
-    ";
+        gd.gebelik_dongu_adi = 'gebe'
+        AND d.dollenme_durumu = 'evet'
+        AND i.kullanici_id = :kullanici_id";
 
         // SQL sorgusunu hazırlama
         $stmt = $db->prepare($sql);
@@ -48,6 +45,33 @@ if ($db instanceof PDO) {
 
         // Eğer sonuç yoksa veya boşsa, uyarı mesajı göster
         if (!$result) {
+            // Sonuç yoksa bir işlem yapılabilir.
+        } else {
+            foreach ($result as $row) {
+                // Gebelik günü 280 gün veya daha fazlaysa
+                if ($row['gebelik_gunu'] >= 280) {
+                    // Doğum yaptıktan sonra servis periyoduna geçmek için gebelik_dongu_id'yi güncelle
+                    $sql_update = "UPDATE inek SET gebelik_dongu_id = 1, sut_dongu_id = 2 WHERE inek_id = :inek_id";
+                    $stmt_update = $db->prepare($sql_update);
+                    $stmt_update->execute([':inek_id' => $row['inek_id']]);
+
+                    // Döngü adı 'gebe' olan ineklerin dollenme durumunu 'hayır' olarak güncelle
+                    $sql_dollenme_update = "UPDATE dollenme SET dollenme_durumu = 'hayir' WHERE inek_id = :inek_id";
+                    $stmt_dollenme_update = $db->prepare($sql_dollenme_update);
+                    $stmt_dollenme_update->execute([':inek_id' => $row['inek_id']]);
+                } elseif ($row['dogum_durumu'] === 'Doğum Yaptı') {
+                    // Doğum yapan bir ineği servis periyoduna almak için gebelik_dongu_id'yi ve sut_dongu_id'yi güncelle
+                    $sql_update = "UPDATE inek SET gebelik_dongu_id = 1, sut_dongu_id = 2 WHERE inek_id = :inek_id";
+                    $stmt_update = $db->prepare($sql_update);
+                    $stmt_update->execute([':inek_id' => $row['inek_id']]);
+
+                    // Döngü adı 'gebe' olan ineklerin dollenme durumunu 'hayır' olarak güncelle
+                    $sql_dollenme_update = "UPDATE dollenme SET dollenme_durumu = 'hayir' WHERE inek_id = :inek_id";
+                    $stmt_dollenme_update = $db->prepare($sql_dollenme_update);
+                    $stmt_dollenme_update->execute([':inek_id' => $row['inek_id']]);
+                }
+            }
+
 
         }
     } catch (PDOException $e) {
@@ -58,12 +82,7 @@ if ($db instanceof PDO) {
     // Veritabanı bağlantısı sağlanamadı hatası
     echo "Veritabanı bağlantısı sağlanamadı.";
 }
-
-
-
 ?>
-
-
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -236,8 +255,7 @@ if ($db instanceof PDO) {
                 <div class="card">
                     <div class="card-body">
                         <h6 class="card-title text-uppercase text-primary mb-3 row justify-content-center"
-                            style="letter-spacing: 5px;">Gebe
-                            Takip Tablosu</h6>
+                            style="letter-spacing: 5px;">Gebe Takip Tablosu</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -245,7 +263,7 @@ if ($db instanceof PDO) {
                                         <th>QR</th>
                                         <th>Adı</th>
                                         <th>Döngü Adı</th>
-                                        <th>Döngünün Kaçıncı Günü</th>
+                                        <th>Gebelik Günü</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -254,26 +272,15 @@ if ($db instanceof PDO) {
                                         <tr>
                                             <td><?php echo $row['QR']; ?></td>
                                             <td><?php echo $row['ad']; ?></td>
-                                            <td>
-                                                <?php
-                                                if ($row['durum'] !== 'Gebelik Periyodunda') {
-                                                    echo "Doğum Yaptı - Servis Periyodunda ";
-                                                } else {
-                                                    echo $row['durum'];
-                                                }
-                                                ?>
-
+                                            <td><?php echo $row['gebelik_gunu'] >= 280 ? 'Doğum Yaptı' : $row['gebelik_dongu_adi']; ?>
                                             </td>
-                                            <td><?php echo isset($row['gun']) ? $row['gun'] : '-'; ?></td>
+                                            <td><?php echo $row['gebelik_gunu'] >= 280 ? '-' : $row['gebelik_gunu']; ?></td>
                                             <td>
-                                                <?php if ($row['durum'] !== 'Gebelik Periyodunda'): ?>
-                                                    <a href="<?php echo $row['durum'] !== 'Gebelik Periyodunda' ? 'inekKayit.php' : 'İnek Ekle'; ?>"
-                                                        class="btn btn-primary">
-                                                        <?php echo $row['durum'] !== 'Gebelik Periyodunda' ? 'Yenidoğan Ekle' : ''; ?>
-                                                    </a>
+                                                <?php if ($row['gebelik_gunu'] >= 280): ?>
+                                                    <a href="inekKayit.php?inek_id=<?php echo $row['inek_id']; ?>"
+                                                        class="btn btn-primary">Yenidoğan Ekle</a>
                                                 <?php endif; ?>
                                             </td>
-
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -284,6 +291,7 @@ if ($db instanceof PDO) {
             </div>
         </div>
     </div>
+
     <!-- Booking End -->
 
     <!-- Footer Start -->

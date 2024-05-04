@@ -8,39 +8,39 @@ if ($db instanceof PDO) {
     try {
         // SQL sorgusu
         $sql = "SELECT 
-        i.QR,
-        i.inek_id,
-        i.ad,
-        i.dogum_tarihi,
-        i.dogurma_tarihi,
-        d.dollenme_durumu,
-        ko.kilo,
-        so.sut_miktar,
-        DATEDIFF(day, i.dogurma_tarihi, GETDATE()) AS gun_farki,
+        inek.QR,
+        inek.dogum_tarihi,
+        inek.dogurma_tarihi,
+        dollenme.dollenme_tarihi,
+        inek.ad AS inek_adi,
+        gebelik_dongu.gebelik_dongu_adi,
+        sut_dongu.sut_dongu_adi,
+        kilo_olcum.kilo,
+        sut_olcum.sut_miktar,
         CASE 
-                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) < 305 THEN 'Sağım Dönemi'
-                    WHEN DATEDIFF(day, i.dogurma_tarihi, GETDATE()) BETWEEN 305 AND 365 THEN 'Kuru Dönem'
+                    WHEN sut_dongu.sut_dongu_adi = 'sagimda' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())  
+                    WHEN sut_dongu.sut_dongu_adi = 'kuruda' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE()) - 305
+                    ELSE NULL 
         END AS sut_durum,
         CASE 
-            WHEN GETDATE() < DATEADD(day, 86, i.dogurma_tarihi) THEN 'Servis Periyodu'
-            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN 'Gebelik Periyodu'
-            ELSE 'Sürüden Çıkarılmalı'
-        END AS gebe_durum,
-        CASE 
-            WHEN GETDATE() < DATEADD(day, 86, i.dogurma_tarihi) THEN DATEDIFF(day, i.dogurma_tarihi, GETDATE())
-            WHEN d.dollenme_durumu = 'evet' AND GETDATE() < DATEADD(day, 280, d.dollenme_tarihi) THEN DATEDIFF(day, d.dollenme_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, dollenme.dollenme_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'serviste' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())
             ELSE NULL
-        END AS gun
+        END AS gun_farki
     FROM 
-        inek i
+        inek
+    JOIN 
+        gebelik_dongu ON inek.gebelik_dongu_id = gebelik_dongu.gebelik_dongu_id
+    JOIN 
+        sut_dongu ON inek.sut_dongu_id = sut_dongu.sut_dongu_id
     LEFT JOIN 
-        dollenme d ON i.inek_id = d.inek_id
-LEFT JOIN
-    kilo_olcum ko ON i.QR = ko.QR
-LEFT JOIN
-    sut_olcum so ON i.QR = so.QR
+        kilo_olcum ON inek.QR = kilo_olcum.QR
+    LEFT JOIN 
+        sut_olcum ON inek.QR = sut_olcum.QR
+    LEFT JOIN 
+        dollenme ON inek.inek_id = dollenme.inek_id   
     WHERE
-        i.kullanici_id = :kullanici_id    
+        inek.kullanici_id = :kullanici_id    
     ";
 
         // SQL sorgusunu hazırlama
@@ -59,6 +59,17 @@ LEFT JOIN
         if (!$result) {
 
         }
+
+
+        foreach ($result as $row) {
+            // Servis periyoduna geçildiğinde sut_dongu_id'yi 2 olarak güncelle
+            if ($row['gebelik_dongu_adi'] == 'serviste') {
+                // İneğin sut_dongu_id'sini güncelle
+                $updateSQL = "UPDATE inek SET sut_dongu_id = 2 WHERE QR = :qr";
+                $updateStmt = $db->prepare($updateSQL);
+                $updateStmt->execute([':qr' => $row['QR']]);
+            }
+        }
     } catch (PDOException $e) {
         // Hata durumunda hata mesajını ekrana yazdırma
         echo "Hata: " . $e->getMessage();
@@ -69,6 +80,7 @@ LEFT JOIN
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="tr">
@@ -275,37 +287,37 @@ LEFT JOIN
                                                     QR değeri yok
                                                 <?php endif; ?>
                                             </td>
-                                            <td><?php echo $row['ad']; ?></td>
+                                            <td><?php echo $row['inek_adi']; ?></td>
                                             <td>
                                                 <?php if ($yas < 2): ?>
                                                     Yenidoğan
                                                 <?php else: ?>
-                                                    <?php echo $row['gebe_durum']; ?>
+                                                    <?php echo $row['gebelik_dongu_adi']; ?>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php if (isset($row['gun'])): ?>
-                                                    <?php echo $row['gun']; ?>
+                                                <?php if (isset($row['gun_farki'])): ?>
+                                                    <?php echo $row['gun_farki']; ?>
                                                 <?php else: ?>
                                                     -
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php if (isset($row['sut_durum'])): ?>
-                                                    <?php echo $row['sut_durum']; ?>
+                                                <?php if (isset($row['sut_dongu_adi'])): ?>
+                                                    <?php echo $row['sut_dongu_adi']; ?>
                                                 <?php else: ?>
                                                     -
                                                 <?php endif; ?>
                                             </td>
                                             <td>
                                                 <?php
-                                                if (isset($row['gun_farki']) && $row['gebe_durum'] !== 'Sürüden Çikarilmali') {
-                                                    if ($row['sut_durum'] === 'Kuru Dönem') {
+                                                if (isset($row['sut_dongu_adi']) || $row['gebelik_dongu_adi'] !== 'Sürüden Çikarilmali') {
+                                                    if ($row['sut_dongu_adi'] === 'Kuruda') {
                                                         // Kuru dönemdeyken gun_farki hesaplaması
-                                                        echo $row['gun_farki'] - 305;
+                                                        echo $row['sut_durum'];
                                                     } else {
                                                         // Diğer durumlarda gun_farki direkt olarak gösterilsin
-                                                        echo $row['gun_farki'];
+                                                        echo $row['sut_durum'];
                                                     }
                                                 } else {
                                                     echo '-';
