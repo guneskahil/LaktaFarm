@@ -111,7 +111,8 @@ if (isset($_GET['delete_inek'])) {
         $stmt4 = $db->prepare($sql_delete_inek);
         $stmt4->execute();
 
-        // Redirect or show a success message to the user
+        header("Location:dollemeTakip.php");
+        exit(); // Ensure that no more output is sent after the redirection
     } catch (PDOException $e) {
         // Handle errors
         echo "Error: " . $e->getMessage();

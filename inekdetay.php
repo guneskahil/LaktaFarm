@@ -280,7 +280,7 @@ if (isset($_GET['QR'])) {
                                 </div>
                             </div>
                             <div class="text-center mb-4">
-                                <h3>Döngü Bilgisi</h3>
+                                <h5>Yaşam Payı Enerji İhtiyacı</h5>
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-2 col-form-label">Kilo</label>

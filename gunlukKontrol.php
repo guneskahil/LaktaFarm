@@ -23,8 +23,9 @@ if ($db instanceof PDO) {
                     ELSE NULL 
         END AS sut_durum,
         CASE 
-            WHEN gebelik_dongu.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, dollenme.dollenme_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'gebe' THEN DATEDIFF(day, dollenme.dollenme_tarihi, GETDATE())+1
             WHEN gebelik_dongu.gebelik_dongu_adi = 'serviste' THEN DATEDIFF(day, inek.dogurma_tarihi, GETDATE())
+            WHEN gebelik_dongu.gebelik_dongu_adi = 'yenidogan' THEN DATEDIFF(day, inek.dogum_tarihi, GETDATE())
             ELSE NULL
         END AS gun_farki
     FROM 
@@ -273,12 +274,6 @@ if ($db instanceof PDO) {
                                 </thead>
                                 <tbody>
                                     <?php foreach ($result as $row): ?>
-                                        <?php
-                                        // İneğin yaşını hesapla
-                                        $dogum_tarihi = new DateTime($row['dogum_tarihi']);
-                                        $bugun = new DateTime();
-                                        $yas = $dogum_tarihi->diff($bugun)->y;
-                                        ?>
                                         <tr>
                                             <td>
                                                 <?php if (isset($row['QR'])): ?>
@@ -289,11 +284,7 @@ if ($db instanceof PDO) {
                                             </td>
                                             <td><?php echo $row['inek_adi']; ?></td>
                                             <td>
-                                                <?php if ($yas < 2): ?>
-                                                    Yenidoğan
-                                                <?php else: ?>
-                                                    <?php echo $row['gebelik_dongu_adi']; ?>
-                                                <?php endif; ?>
+                                                <?php echo $row['gebelik_dongu_adi']; ?>
                                             </td>
                                             <td>
                                                 <?php if (isset($row['gun_farki'])): ?>
@@ -311,10 +302,10 @@ if ($db instanceof PDO) {
                                             </td>
                                             <td>
                                                 <?php
-                                                if (isset($row['sut_dongu_adi']) || $row['gebelik_dongu_adi'] !== 'Sürüden Çikarilmali') {
-                                                    if ($row['sut_dongu_adi'] === 'Kuruda') {
-                                                        // Kuru dönemdeyken gun_farki hesaplaması
-                                                        echo $row['sut_durum'];
+                                                if (isset($row['sut_dongu_adi']) !== 'Sürüden Çikarilmali') {
+                                                    if ($row['gebelik_dongu_adi'] === 'Yenidogan') {
+                                                        // Yenidoğanken gun_farki hesaplaması
+                                                        echo '-';
                                                     } else {
                                                         // Diğer durumlarda gun_farki direkt olarak gösterilsin
                                                         echo $row['sut_durum'];
@@ -325,8 +316,20 @@ if ($db instanceof PDO) {
                                                 ?>
                                             </td>
 
-                                            <td><?php echo $row['kilo']; ?></td>
-                                            <td><?php echo $row['sut_miktar']; ?></td>
+                                            <td>
+                                                <?php if (isset($row['kilo'])): ?>
+                                                    <?php echo $row['kilo']; ?>
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if (isset($row['sut_miktar'])): ?>
+                                                    <?php echo $row['sut_miktar']; ?>
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
+                                            </td>
                                             <td><a href="inekdetay.php?QR=<?php echo $row['QR']; ?>"
                                                     class="btn btn-primary">Detay</a></td>
                                         </tr>

@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
 
     if ($db instanceof PDO) {
         // SQL sorgusunu hazırla
-        $query = $db->prepare("INSERT INTO inek (QR, ad, irk, dogum_tarihi, kullanici_id) VALUES (:QR, :ad, :irk, :dogum_tarihi, :kullanici_id)");
+        $query = $db->prepare("INSERT INTO inek (QR, ad, irk, dogum_tarihi, kullanici_id, sut_dongu_id, gebelik_dongu_id) VALUES (:QR, :ad, :irk, :dogum_tarihi, :kullanici_id,:sut_dongu_id, :gebelik_dongu_id)");
 
         // Parametreleri bağla
         $query->bindParam(':QR', $QR);
@@ -25,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Kaydet'])) {
         $query->bindParam(':irk', $irk);
         $query->bindParam(':dogum_tarihi', $dogum_tarihi);
         $query->bindParam(':kullanici_id', $kullanici_id);
+        $query->bindValue(':sut_dongu_id', 1); // Süt döngüsü ID'si 1 olarak atanıyor
+        $query->bindValue(':gebelik_dongu_id', 4); // Süt döngüsü ID'si 1 olarak atanıyor
         // Sorguyu çalıştır
         if ($query->execute()) {
             // Başarılı bir şekilde eklendiğinde kullanıcıyı başka bir sayfaya yönlendir
@@ -252,7 +254,7 @@ $irk = "";
                 <form action="inekKayit.php" method="POST">
                     <div class="form-group">
                         <input type="text" class="form-control p-4" name="QR" placeholder="QR kodu"
-                            value="<?php echo $next_qr_code; ?>" required="required" />
+                            value="<?php echo $next_qr_code; ?>" required="required" readonly />
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control p-4" name="irk" placeholder="Irk"
@@ -267,7 +269,7 @@ $irk = "";
                             value="<?php echo $dogum_tarihi; ?>" required="required" />
                     </div>
                     <div>
-                        <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Kaydet</button>
+                        <button class="btn btn-primary btn-block py-3" name="Kaydet" type="submit">Ekle</button>
                     </div>
                 </form>
             </div>

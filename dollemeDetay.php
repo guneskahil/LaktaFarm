@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
             // Döllenme durumu "Hayır" olarak işaretlenirse, döllenme sayısını artır
             if ($dollenme_durumu === "Hayır") {
                 $dollenme_sayisi++;
-                if ($dollenme_sayisi > 3) {
+                if ($dollenme_sayisi >= 3) {
                     // UPDATE sorgusunu oluştur
                     $sqlUpdateGebelikDongu = "UPDATE inek SET gebelik_dongu_id = 3 WHERE inek_id = :inek_id";
                     // Bağlantıyı hazırla ve sorguyu çalıştır
@@ -268,7 +268,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
                 <h1>Döllenme Detayı</h1>
             </div>
             <div class="row justify-content-center">
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                     <div class="contact-form bg-white" style="padding: 30px;">
                         <div id="success"></div>
                         <form name="guncelle" id="guncelle"
@@ -301,11 +301,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['bilgiGuncelle'])) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-center mb-3 py-3">
-                                <h3>Yeniden dölleme için zaman tutsun</h3>
+                            <div class="text-center mb-3 py-3" style="margin-bottom:10px">
+                                <p style="color:red">**Dölleme gerçekleştiyse inek 'Gebe' periyoduna alınacaktır.</p>
+                                <?php
+                                if ($dollenme_sayisi == 2) {
+                                    echo '<p style="color:red">**Dölleme gerçekleşmediyse inek sürüden çıkarılacaktır.</p>';
+                                }
+                                ?>
                             </div>
-                            <div class="text-center" style="margin-top: 10px;">
-                                <p>Dölleme Gerçekleşti Mi?</p>
+                            <div class="text-center mb-3">
+                                <h5>Dölleme Gerçekleşti Mi?</h5>
                             </div>
                             <div class="control-group ">
                                 <div class="row justify-content-center">
