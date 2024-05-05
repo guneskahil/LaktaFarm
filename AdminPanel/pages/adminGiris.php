@@ -4,79 +4,79 @@ session_start();
 // Veritabanı bağlantısını gerçekleştiren fonksiyon
 function dbBaglantisi()
 {
-    $sunucu = "bulutsqlserver.database.windows.net";
-    $veritabani = "LaktaFarmDB";
-    $kullanici = "sqladmin";
-    $sifre = "bulutadmin.123";
+  $sunucu = "bulutserversql.database.windows.net";
+  $veritabani = "LaktaFarmDB";
+  $kullanici = "sqladmin";
+  $sifre = "bulutadmin.123";
 
-    try {
-        $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
-        // Hata modunu ayarlama
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $db;
-    } catch (PDOException $e) {
-        // Bağlantı hatası durumunda hata mesajını ekrana yazdırma
-        echo "Bağlantı hatası: " . $e->getMessage();
-        return null;
-    }
+  try {
+    $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
+    // Hata modunu ayarlama
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $db;
+  } catch (PDOException $e) {
+    // Bağlantı hatası durumunda hata mesajını ekrana yazdırma
+    echo "Bağlantı hatası: " . $e->getMessage();
+    return null;
+  }
 }
 
 // Admin girişini kontrol eden fonksiyon
 function adminGirisKontrol($email, $sifre)
 {
-    $db = dbBaglantisi();
+  $db = dbBaglantisi();
 
-    if ($db instanceof PDO) {
-        try {
-            // SQL sorgusu
-            $sql = "SELECT * FROM admin WHERE admin_mail = :email AND admin_sifre = :sifre";
+  if ($db instanceof PDO) {
+    try {
+      // SQL sorgusu
+      $sql = "SELECT * FROM admin WHERE admin_mail = :email AND admin_sifre = :sifre";
 
-            // SQL sorgusunu hazırlama
-            $stmt = $db->prepare($sql);
+      // SQL sorgusunu hazırlama
+      $stmt = $db->prepare($sql);
 
-            // Parametreleri bağlama
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':sifre', $sifre);
+      // Parametreleri bağlama
+      $stmt->bindParam(':email', $email);
+      $stmt->bindParam(':sifre', $sifre);
 
-            // SQL sorgusunu çalıştırma
-            $stmt->execute();
+      // SQL sorgusunu çalıştırma
+      $stmt->execute();
 
-            // Sonuçları alma
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      // Sonuçları alma
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Eğer sonuç varsa ve sadece bir tane admin dönüyorsa giriş yap
-            if ($result && count($result) === 1) {
-                $_SESSION['admin_id'] = $result[0]['admin_id']; // Admin kimliğini oturumda sakla
-                return true;
-            } else {
-                return false;
-            }
-        } catch (PDOException $e) {
-            // Hata durumunda hata mesajını ekrana yazdırma
-            echo "Hata: " . $e->getMessage();
-            return false;
-        }
-    } else {
-        // Veritabanı bağlantısı sağlanamadı hatası
-        echo "Veritabanı bağlantısı sağlanamadı.";
+      // Eğer sonuç varsa ve sadece bir tane admin dönüyorsa giriş yap
+      if ($result && count($result) === 1) {
+        $_SESSION['admin_id'] = $result[0]['admin_id']; // Admin kimliğini oturumda sakla
+        return true;
+      } else {
         return false;
+      }
+    } catch (PDOException $e) {
+      // Hata durumunda hata mesajını ekrana yazdırma
+      echo "Hata: " . $e->getMessage();
+      return false;
     }
+  } else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+    return false;
+  }
 }
 
 // Formdan gelen verileri al
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $sifre = $_POST['sifre'];
+  $email = $_POST['email'];
+  $sifre = $_POST['sifre'];
 
-    // Giriş kontrolü
-    if (adminGirisKontrol($email, $sifre)) {
-        // Giriş başarılıysa yönlendirme yap
-        header("kullaniciBilgi.php"); // Örneğin, yönlendirilecek sayfanın adını dashboard.php olarak varsayalım
-        exit();
-    } else {
-        // Giriş başarısızsa hata mesajı göster
-        echo "Hatalı e-posta veya şifre.";
-    }
+  // Giriş kontrolü
+  if (adminGirisKontrol($email, $sifre)) {
+    // Giriş başarılıysa yönlendirme yap
+    header("kullaniciBilgi.php"); // Örneğin, yönlendirilecek sayfanın adını dashboard.php olarak varsayalım
+    exit();
+  } else {
+    // Giriş başarısızsa hata mesajı göster
+    echo "Hatalı e-posta veya şifre.";
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -88,10 +88,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-LaktaFarm AdminGirişi
+    LaktaFarm AdminGirişi
   </title>
   <!--     Fonts and icons     -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
   <!-- Nucleo Icons -->
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -107,9 +108,10 @@ LaktaFarm AdminGirişi
 </head>
 
 <body class="bg-gray-200">
-  
+
   <main class="main-content  mt-0">
-    <div class="page-header align-items-start min-vh-100" style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');">
+    <div class="page-header align-items-start min-vh-100"
+      style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');">
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container my-auto">
         <div class="row">
@@ -124,26 +126,26 @@ LaktaFarm AdminGirişi
                 </div>
               </div>
               <div class="card-body">
-              <form role="form" class="text-start" method="POST" action="kullaniciBilgi.php">
-    <div class="input-group input-group-outline my-3">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" name="email">
-    </div>
-    <div class="input-group input-group-outline mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-control" name="sifre">
-    </div>
+                <form role="form" class="text-start" method="POST" action="kullaniciBilgi.php">
+                  <div class="input-group input-group-outline my-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email">
+                  </div>
+                  <div class="input-group input-group-outline mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="sifre">
+                  </div>
 
-    <div class="text-center">
-        <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">Giriş Yap</button>
-    </div>
-</form>
+                  <div class="text-center">
+                    <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">Giriş Yap</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
       </div>
-   
+
     </div>
   </main>
   <!--   Core JS Files   -->

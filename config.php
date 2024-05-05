@@ -3,7 +3,7 @@
 
 function dbBaglantisi()
 {
-    $sunucu = "bulutsqlserver.database.windows.net";
+    $sunucu = "bulutserversql.database.windows.net";
     $veritabani = "LaktaFarmDB";
     $kullanici = "sqladmin";
     $sifre = "bulutadmin.123";

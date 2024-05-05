@@ -4,88 +4,88 @@ session_start();
 // Veritabanı bağlantısını gerçekleştiren fonksiyon
 function dbBaglantisi()
 {
-    $sunucu = "bulutsqlserver.database.windows.net";
-    $veritabani = "LaktaFarmDB";
-    $kullanici = "sqladmin";
-    $sifre = "bulutadmin.123";
+  $sunucu = "bulutserversql.database.windows.net";
+  $veritabani = "LaktaFarmDB";
+  $kullanici = "sqladmin";
+  $sifre = "bulutadmin.123";
 
-    try {
-        $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
-        // Hata modunu ayarlama
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $db;
-    } catch (PDOException $e) {
-        // Bağlantı hatası durumunda hata mesajını ekrana yazdırma
-        echo "Bağlantı hatası: " . $e->getMessage();
-        return null;
-    }
+  try {
+    $db = new PDO("sqlsrv:server=$sunucu;Database=$veritabani;", $kullanici, $sifre);
+    // Hata modunu ayarlama
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $db;
+  } catch (PDOException $e) {
+    // Bağlantı hatası durumunda hata mesajını ekrana yazdırma
+    echo "Bağlantı hatası: " . $e->getMessage();
+    return null;
+  }
 }
 
 // Admin ekleme fonksiyonu
 function adminEkle($email, $sifre)
 {
-    $db = dbBaglantisi();
+  $db = dbBaglantisi();
 
-    if ($db instanceof PDO) {
-        try {
-            // SQL sorgusu
-            $sql = "INSERT INTO admin (admin_mail, admin_sifre) VALUES (:email, :sifre)";
+  if ($db instanceof PDO) {
+    try {
+      // SQL sorgusu
+      $sql = "INSERT INTO admin (admin_mail, admin_sifre) VALUES (:email, :sifre)";
 
-            // SQL sorgusunu hazırlama
-            $stmt = $db->prepare($sql);
+      // SQL sorgusunu hazırlama
+      $stmt = $db->prepare($sql);
 
-            // Parametreleri bağlama
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':sifre', $sifre);
+      // Parametreleri bağlama
+      $stmt->bindParam(':email', $email);
+      $stmt->bindParam(':sifre', $sifre);
 
-            // SQL sorgusunu çalıştırma
-            $stmt->execute();
+      // SQL sorgusunu çalıştırma
+      $stmt->execute();
 
-            // Ekleme işlemi başarılıysa true dön
-            return true;
-        } catch (PDOException $e) {
-            // Hata durumunda hata mesajını ekrana yazdırma
-            echo "Hata: " . $e->getMessage();
-            return false;
-        }
-    } else {
-        // Veritabanı bağlantısı sağlanamadı hatası
-        echo "Veritabanı bağlantısı sağlanamadı.";
-        return false;
+      // Ekleme işlemi başarılıysa true dön
+      return true;
+    } catch (PDOException $e) {
+      // Hata durumunda hata mesajını ekrana yazdırma
+      echo "Hata: " . $e->getMessage();
+      return false;
     }
+  } else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+    return false;
+  }
 }
 
 
 // Admin verilerini çeken fonksiyon
 function adminVerileriGetir()
 {
-    $db = dbBaglantisi();
+  $db = dbBaglantisi();
 
-    if ($db instanceof PDO) {
-        try {
-            // SQL sorgusu
-            $sql = "SELECT * FROM admin";
+  if ($db instanceof PDO) {
+    try {
+      // SQL sorgusu
+      $sql = "SELECT * FROM admin";
 
-            // SQL sorgusunu hazırlama
-            $stmt = $db->prepare($sql);
+      // SQL sorgusunu hazırlama
+      $stmt = $db->prepare($sql);
 
-            // SQL sorgusunu çalıştırma
-            $stmt->execute();
+      // SQL sorgusunu çalıştırma
+      $stmt->execute();
 
-            // Sonuçları alma
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      // Sonuçları alma
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            return $result;
-        } catch (PDOException $e) {
-            // Hata durumunda hata mesajını ekrana yazdırma
-            echo "Hata: " . $e->getMessage();
-            return false;
-        }
-    } else {
-        // Veritabanı bağlantısı sağlanamadı hatası
-        echo "Veritabanı bağlantısı sağlanamadı.";
-        return false;
+      return $result;
+    } catch (PDOException $e) {
+      // Hata durumunda hata mesajını ekrana yazdırma
+      echo "Hata: " . $e->getMessage();
+      return false;
     }
+  } else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+    return false;
+  }
 }
 
 // Admin verilerini al
@@ -94,49 +94,49 @@ $result = adminVerileriGetir();
 // Admin silme fonksiyonu
 function adminSil($admin_id)
 {
-    $db = dbBaglantisi();
+  $db = dbBaglantisi();
 
-    if ($db instanceof PDO) {
-        try {
-            // SQL sorgusu
-            $sql = "DELETE FROM admin WHERE admin_id = :admin_id";
+  if ($db instanceof PDO) {
+    try {
+      // SQL sorgusu
+      $sql = "DELETE FROM admin WHERE admin_id = :admin_id";
 
-            // SQL sorgusunu hazırlama
-            $stmt = $db->prepare($sql);
+      // SQL sorgusunu hazırlama
+      $stmt = $db->prepare($sql);
 
-            // Parametreleri bağlama
-            $stmt->bindParam(':admin_id', $admin_id);
+      // Parametreleri bağlama
+      $stmt->bindParam(':admin_id', $admin_id);
 
-            // SQL sorgusunu çalıştırma
-            $stmt->execute();
+      // SQL sorgusunu çalıştırma
+      $stmt->execute();
 
-            // Silme işlemi başarılıysa true dön
-            return true;
-        } catch (PDOException $e) {
-            // Hata durumunda hata mesajını ekrana yazdırma
-            echo "Hata: " . $e->getMessage();
-            return false;
-        }
-    } else {
-        // Veritabanı bağlantısı sağlanamadı hatası
-        echo "Veritabanı bağlantısı sağlanamadı.";
-        return false;
+      // Silme işlemi başarılıysa true dön
+      return true;
+    } catch (PDOException $e) {
+      // Hata durumunda hata mesajını ekrana yazdırma
+      echo "Hata: " . $e->getMessage();
+      return false;
     }
+  } else {
+    // Veritabanı bağlantısı sağlanamadı hatası
+    echo "Veritabanı bağlantısı sağlanamadı.";
+    return false;
+  }
 }
 
 // Formdan gelen admin_id'yi kullanarak admin silme işlemini gerçekleştirin
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
-    $admin_id = $_POST['admin_id'];
+  $admin_id = $_POST['admin_id'];
 
-    // Admin silme işlemi
-    if (adminSil($admin_id)) {
-        // Silme başarılıysa yönlendirme yapabilirsiniz
-        header("Location: adminTablo.php");
-        exit();
-    } else {
-        // Silme başarısızsa hata mesajı göster
-        echo "Admin silme işlemi başarısız.";
-    }
+  // Admin silme işlemi
+  if (adminSil($admin_id)) {
+    // Silme başarılıysa yönlendirme yapabilirsiniz
+    header("Location: adminTablo.php");
+    exit();
+  } else {
+    // Silme başarısızsa hata mesajı göster
+    echo "Admin silme işlemi başarısız.";
+  }
 }
 ?>
 
@@ -152,7 +152,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
     Material Dashboard 2 by Creative Tim
   </title>
   <!--     Fonts and icons     -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
   <!-- Nucleo Icons -->
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -168,10 +169,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
-  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+  <aside
+    class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark"
+    id="sidenav-main">
     <div class="sidenav-header">
-      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
+      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+        aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard "
+        target="_blank">
         <img src="../assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold text-white">Admin Kontrol Paneli</span>
       </a>
@@ -182,12 +187,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
         <li class="nav-item">
           <a class="nav-link text-white " href="../pages/dashboard.html">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <div class="mt-2 d-flex">
-          <h6 class="mb-0">Light / Dark</h6>
-          <div class="form-check form-switch ps-5 ms-auto my-auto">
-            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
-          </div>
-        </div>
+              <div class="mt-2 d-flex">
+                <h6 class="mb-0">Light / Dark</h6>
+                <div class="form-check form-switch ps-5 ms-auto my-auto">
+                  <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version"
+                    onclick="darkMode(this)">
+                </div>
+              </div>
             </div>
           </a>
         </li>
@@ -211,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
       <div class="mx-3">
-      <a class="btn btn-outline-primary mt-4 w-100" href="../pages/adminDuzenle.php" type="button">Admin Ekle</a>
+        <a class="btn btn-outline-primary mt-4 w-100" href="../pages/adminDuzenle.php" type="button">Admin Ekle</a>
         <a class="btn bg-gradient-primary w-100" href="../pages/adminGiris.php" type="button">Çıkış Yap</a>
       </div>
     </div>
@@ -220,66 +226,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
     <!-- End Navbar -->
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
       <div class="container-fluid py-4">
-          <div class="row">
-            <div class="col-12">
-              <div class="card my-1">
-                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                  <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3">Kayıtlı Admin Bilgileri</h6>
-                  </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="card my-1">
+              <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                  <h6 class="text-white text-capitalize ps-3">Kayıtlı Admin Bilgileri</h6>
                 </div>
-                <div class="card-body px-0 pb-2">
-                  <div class="table-responsive p-0">
+              </div>
+              <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
                   <table class="table align-items-center mb-0">
-    <thead>
-        <tr>
-            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Admin ID</th>
-            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admin Mail</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Şifre</th>
-        
-            <th class="text-secondary opacity-7"></th>
-        </tr>
-        
-    </thead>
-    <tbody>
-        <?php
-        // Eğer verileri başarıyla çektinizse foreach döngüsüyle tabloyu oluşturun
-        if ($result) {
-            foreach ($result as $row) {
-        ?>
-                <tr>
-                    <td><?php echo $row['admin_id']; ?></td>
-                    <td><?php echo $row['admin_mail']; ?></td>
-                    <td class="text-center"><?php echo $row['admin_sifre']; ?></td>
-                    <td>
-                        <!-- Silme işlemi için form -->
-                        <form method="POST">
-                            <input type="hidden" name="admin_id" value="<?php echo $row['admin_id']; ?>">
-                            <button type="submit" class="btn btn-sm btn-danger" name="sil">Sil</button>
-                        </form>
-                    </td>
-                    <td>
-    <a href="adminGuncelle.php?admin_id=<?php echo $row['admin_id']; ?>" class="btn btn-primary">Güncelle</a>
-</td>
-                </tr>
-        <?php
-            }
-        } else {
-            // Veritabanından veri alınamadıysa hata mesajı göster
-            echo "<tr><td colspan='4'>Veri bulunamadı.</td></tr>";
-        }
-        ?>
-        
-    </tbody>
-</table>
-                  </div>
+                    <thead>
+                      <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Admin ID</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admin Mail
+                        </th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                          Şifre</th>
+
+                        <th class="text-secondary opacity-7"></th>
+                      </tr>
+
+                    </thead>
+                    <tbody>
+                      <?php
+                      // Eğer verileri başarıyla çektinizse foreach döngüsüyle tabloyu oluşturun
+                      if ($result) {
+                        foreach ($result as $row) {
+                          ?>
+                          <tr>
+                            <td><?php echo $row['admin_id']; ?></td>
+                            <td><?php echo $row['admin_mail']; ?></td>
+                            <td class="text-center"><?php echo $row['admin_sifre']; ?></td>
+                            <td>
+                              <!-- Silme işlemi için form -->
+                              <form method="POST">
+                                <input type="hidden" name="admin_id" value="<?php echo $row['admin_id']; ?>">
+                                <button type="submit" class="btn btn-sm btn-danger" name="sil">Sil</button>
+                              </form>
+                            </td>
+                            <td>
+                              <a href="adminGuncelle.php?admin_id=<?php echo $row['admin_id']; ?>"
+                                class="btn btn-primary">Güncelle</a>
+                            </td>
+                          </tr>
+                          <?php
+                        }
+                      } else {
+                        // Veritabanından veri alınamadıysa hata mesajı göster
+                        echo "<tr><td colspan='4'>Veri bulunamadı.</td></tr>";
+                      }
+                      ?>
+
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </main>
-    
+
   </main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
@@ -306,7 +315,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
         </div>
         <a href="javascript:void(0)" class="switch-trigger background-color">
           <div class="badge-colors my-2 text-start">
-            <span class="badge filter bg-gradient-primary active" data-color="primary" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-primary active" data-color="primary"
+              onclick="sidebarColor(this)"></span>
             <span class="badge filter bg-gradient-dark" data-color="dark" onclick="sidebarColor(this)"></span>
             <span class="badge filter bg-gradient-info" data-color="info" onclick="sidebarColor(this)"></span>
             <span class="badge filter bg-gradient-success" data-color="success" onclick="sidebarColor(this)"></span>
@@ -320,9 +330,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
           <p class="text-sm">Choose between 2 different sidenav types.</p>
         </div>
         <div class="d-flex">
-          <button class="btn bg-gradient-dark px-3 mb-2 active" data-class="bg-gradient-dark" onclick="sidebarType(this)">Dark</button>
-          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-transparent" onclick="sidebarType(this)">Transparent</button>
-          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-white" onclick="sidebarType(this)">White</button>
+          <button class="btn bg-gradient-dark px-3 mb-2 active" data-class="bg-gradient-dark"
+            onclick="sidebarType(this)">Dark</button>
+          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-transparent"
+            onclick="sidebarType(this)">Transparent</button>
+          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-white"
+            onclick="sidebarType(this)">White</button>
         </div>
         <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
         <!-- Navbar Fixed -->
@@ -340,15 +353,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sil'])) {
           </div>
         </div>
         <hr class="horizontal dark my-sm-4">
-        <a class="btn bg-gradient-info w-100" href="https://www.creative-tim.com/product/material-dashboard-pro">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard">View documentation</a>
+        <a class="btn bg-gradient-info w-100" href="https://www.creative-tim.com/product/material-dashboard-pro">Free
+          Download</a>
+        <a class="btn btn-outline-dark w-100"
+          href="https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard">View documentation</a>
         <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/material-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/material-dashboard on GitHub">Star</a>
+          <a class="github-button" href="https://github.com/creativetimofficial/material-dashboard"
+            data-icon="octicon-star" data-size="large" data-show-count="true"
+            aria-label="Star creativetimofficial/material-dashboard on GitHub">Star</a>
           <h6 class="mt-3">Thank you for sharing!</h6>
-          <a href="https://twitter.com/intent/tweet?text=Check%20Material%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
+          <a href="https://twitter.com/intent/tweet?text=Check%20Material%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard"
+            class="btn btn-dark mb-0 me-2" target="_blank">
             <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
           </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/material-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/material-dashboard"
+            class="btn btn-dark mb-0 me-2" target="_blank">
             <i class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
           </a>
         </div>
